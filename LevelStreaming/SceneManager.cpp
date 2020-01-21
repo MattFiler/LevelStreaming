@@ -15,11 +15,12 @@ bool SceneManager::Init()
 	//Parse levels JSON & load all into LevelScene
 	std::fstream lvl_js("DATA\\LEVELS.JSON");
 	lvl_js >> levels_json;
-	for (int i = 0; i < levels_json["LEVELS"].size(); i++) {
-		bool fe_level = (levels_json["LEVELS"][i]["TYPE"] == "FE_LEVEL");
-		LevelScene* level_scene = new LevelScene(levels_json["LEVELS"][i]["PATH"], fe_level);
+	for (int i = 0; i < levels_json["LEVELS"].size(); i++)
+	{
+		LevelType level_type = (levels_json["LEVELS"][i]["TYPE"] == "FE_LEVEL")?LevelType::FE_LEVEL:LevelType::STD_LEVEL;
+		LevelScene* level_scene = new LevelScene(levels_json["LEVELS"][i]["NAME"], levels_json["LEVELS"][i]["PATH"], level_type);
 		AddScene(level_scene);
-		if (fe_level) ChangeScene(i);
+		if (level_type == LevelType::FE_LEVEL) ChangeScene(i);
 	}
 
 	return dxInit;
@@ -49,7 +50,8 @@ bool SceneManager::Update(double dt)
 	ImGui::Begin("Editor", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
 
 	for (int i = 0; i < availableScenes.size(); i++) {
-		if (ImGui::Button(("Scene " + std::to_string(i)).c_str()))
+		if (!dynamic_cast<LevelScene*>(availableScenes.at(i))) continue; //Expensive every frame... only use for debugging
+		if (ImGui::Button((dynamic_cast<LevelScene*>(availableScenes.at(i))->GetName()).c_str()))
 		{
 			ChangeScene(i);
 		}

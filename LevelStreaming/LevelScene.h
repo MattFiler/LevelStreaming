@@ -5,7 +5,7 @@
 class LevelScene : public Scene
 {
 public:
-	LevelScene(std::string levelPath, bool frontendLevel);
+	LevelScene(std::string levelName, std::string levelPath, LevelType levelType);
 
 	void Init() override;
 	void Release() override;
@@ -13,14 +13,21 @@ public:
 	bool Update(double dt) override;
 	void Render(double dt) override;
 
-	void LoadZone(int id);
-	void UnloadZone(int id);
+	std::string GetName() {
+		return level_name;
+	}
 
 private:
+	bool IsZoneLoaded(int id);
+	void LoadZone(int id);
+	void LoadZoneThread(int id);
+	void UnloadZone(int id);
+
 	Utilities dxutils = Utilities();
 
-	std::string level_path = "";
-	bool is_frontend = false;
+	std::string level_name;
+	std::string level_path;
+	LevelType level_type;
 
 	json commands_json;
 	json models_json;
@@ -30,5 +37,8 @@ private:
 
 	std::vector<ZoneDef> level_zones = std::vector<ZoneDef>();
 	std::vector<ModelDef> level_models = std::vector<ModelDef>();
+
+	bool should_update_queue = false;
+	std::vector<ZoneLoadQueue> zone_load_queue = std::vector<ZoneLoadQueue>();
 };
 

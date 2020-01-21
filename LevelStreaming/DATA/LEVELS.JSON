@@ -1,10 +1,12 @@
 {
 	"LEVELS": [
 		{
+			"NAME": "Frontend Level",
 			"TYPE": "FE_LEVEL",
 			"PATH": "DATA/ENV/PRODUCTION/FRONTEND/"
 		},
 		{
+			"NAME": "Test Level",
 			"TYPE": "STD_LEVEL",
 			"PATH": "DATA/ENV/PRODUCTION/TEST_LEVEL/"
 		}

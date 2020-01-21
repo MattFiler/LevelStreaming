@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <thread>
 
 #include <time.h>
 #include <random>
@@ -35,6 +36,11 @@ using namespace DirectX;
 		#define HR(x) x;
 	#endif
 #endif
+
+enum LevelType {
+	FE_LEVEL, // Frontend Level
+	STD_LEVEL // Standard Level
+};
 
 struct SimpleVertex
 {
@@ -113,6 +119,17 @@ struct Face
 {
 	std::vector<VertexGroup> verts = std::vector<VertexGroup>(); //Vertices (SHOULD BE 3 - TRIANGULATED)
 	std::string materialName = ""; //Material name to link with MTL
+};
+
+struct ZoneLoadQueue {
+	ZoneLoadQueue(std::thread* _t, int _i) {
+		threadOperation = _t;
+		zoneID = _i;
+	}
+	bool executing = true;
+	bool completed = false;
+	std::thread* threadOperation;
+	int zoneID;
 };
 
 struct ModelDef {
