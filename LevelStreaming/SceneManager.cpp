@@ -13,9 +13,6 @@ bool SceneManager::Init()
 	bool dxInit = dxmain::Init();
 
 	AddScene(&test_scene);
-	AddScene(&bush_editor);
-	AddScene(&flower_editor);
-	AddScene(&grass_editor);
 
 	ChangeScene(0); 
 
@@ -50,7 +47,6 @@ bool SceneManager::Update(double dt)
 		ChangeScene(1);
 	}
 	ImGui::SameLine();
-	*/
 	if (ImGui::Button("Flower Generator"))
 	{
 		ChangeScene(2);
@@ -60,6 +56,7 @@ bool SceneManager::Update(double dt)
 	{
 		ChangeScene(3);
 	}
+	*/
 	ImGui::End();
 	
 	//Update current scene

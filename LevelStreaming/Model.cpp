@@ -34,7 +34,7 @@ void Model::Create()
 	//Compile the vertex shader
 	ID3DBlob* pVSBlob = nullptr;
 	Utilities dxutils = Utilities();
-	HR(dxutils.CompileShaderFromFile(L"ObjectShader.fx", "VS", "vs_4_0", &pVSBlob));
+	HR(dxutils.CompileShaderFromFile(L"DATA/SHADERS/ObjectShader.fx", "VS", "vs_4_0", &pVSBlob));
 
 	//Create the vertex shader
 	HR(dxshared::m_pDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &m_vertexShader));
@@ -54,7 +54,7 @@ void Model::Create()
 
 	//Compile the pixel shader
 	ID3DBlob* pPSBlob = nullptr;
-	HR(dxutils.CompileShaderFromFile(L"ObjectShader.fx", "PS", "ps_4_0", &pPSBlob));
+	HR(dxutils.CompileShaderFromFile(L"DATA/SHADERS/ObjectShader.fx", "PS", "ps_4_0", &pPSBlob));
 
 	//Create the pixel shader
 	HR(dxshared::m_pDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &m_pixelShader));

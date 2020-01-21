@@ -70,7 +70,7 @@ void GameObject::Create()
 	//Vertex shader
 	ID3DBlob* pVSBlob = nullptr;
 	Utilities dxutils = Utilities();
-	HR(dxutils.CompileShaderFromFile(L"ObjectShaderDebug.fx", "VSDebug", "vs_4_0", &pVSBlob));
+	HR(dxutils.CompileShaderFromFile(L"DATA/SHADERS/ObjectShaderDebug.fx", "VSDebug", "vs_4_0", &pVSBlob));
 	HR(dxshared::m_pDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, &GO_VertexShader));
 
 	//Input layout
@@ -85,7 +85,7 @@ void GameObject::Create()
 
 	//Pixel shader
 	ID3DBlob* pPSBlob = nullptr;
-	HR(dxutils.CompileShaderFromFile(L"ObjectShaderDebug.fx", "PSDebug", "ps_4_0", &pPSBlob));
+	HR(dxutils.CompileShaderFromFile(L"DATA/SHADERS/ObjectShaderDebug.fx", "PSDebug", "ps_4_0", &pPSBlob));
 	HR(dxshared::m_pDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, &GO_PixelShader));
 	pPSBlob->Release();
 #endif

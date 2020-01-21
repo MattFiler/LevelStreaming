@@ -28,8 +28,6 @@
     <ClCompile Include="dxutils.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
-    <ClCompile Include="GrassEditor.cpp" />
-    <ClCompile Include="GrassGenerator.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
@@ -38,12 +36,9 @@
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="ModelPart.cpp" />
     <ClCompile Include="Model.cpp" />
-    <ClCompile Include="FlowerGenerator.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="TestScene.cpp" />
-    <ClCompile Include="BushEditor.cpp" />
-    <ClCompile Include="FlowerEditor.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -56,8 +51,6 @@
     <ClInclude Include="dxutils.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectManager.h" />
-    <ClInclude Include="GrassEditor.h" />
-    <ClInclude Include="GrassGenerator.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />
@@ -70,14 +63,11 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="ModelPart.h" />
     <ClInclude Include="Model.h" />
-    <ClInclude Include="FlowerGenerator.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TestScene.h" />
-    <ClInclude Include="BushEditor.h" />
-    <ClInclude Include="FlowerEditor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -154,11 +144,7 @@
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <PostBuildEvent>
-      <Command>Xcopy /E /I "$(SolutionDir)models" "$(SolutionDir)$(OutDir)models"
-copy "$(SolutionDir)ObjectShader.fx" "$(SolutionDir)$(OutDir)ObjectShader.fx"
-copy "$(SolutionDir)ObjectShaderDebug.fx" "$(SolutionDir)$(OutDir)ObjectShaderDebug.fx"
-copy "$(SolutionDir)flower_config.json" "$(SolutionDir)$(OutDir)flower_config.json"
-copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json"</Command>
+      <Command>Xcopy /E /I /Y "$(SolutionDir)DATA" "$(SolutionDir)$(OutDir)DATA"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -169,11 +155,7 @@ copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <PostBuildEvent>
-      <Command>Xcopy /E /I "$(SolutionDir)models" "$(SolutionDir)$(OutDir)models"
-copy "$(SolutionDir)ObjectShader.fx" "$(SolutionDir)$(OutDir)ObjectShader.fx"
-copy "$(SolutionDir)ObjectShaderDebug.fx" "$(SolutionDir)$(OutDir)ObjectShaderDebug.fx"
-copy "$(SolutionDir)flower_config.json" "$(SolutionDir)$(OutDir)flower_config.json"
-copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json"</Command>
+      <Command>Xcopy /E /I /Y "$(SolutionDir)DATA" "$(SolutionDir)$(OutDir)DATA"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -190,11 +172,7 @@ copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /E /I "$(SolutionDir)models" "$(SolutionDir)$(OutDir)models"
-copy "$(SolutionDir)ObjectShader.fx" "$(SolutionDir)$(OutDir)ObjectShader.fx"
-copy "$(SolutionDir)ObjectShaderDebug.fx" "$(SolutionDir)$(OutDir)ObjectShaderDebug.fx"
-copy "$(SolutionDir)flower_config.json" "$(SolutionDir)$(OutDir)flower_config.json"
-copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json"</Command>
+      <Command>Xcopy /E /I /Y "$(SolutionDir)DATA" "$(SolutionDir)$(OutDir)DATA"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -211,11 +189,7 @@ copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>Xcopy /E /I "$(SolutionDir)models" "$(SolutionDir)$(OutDir)models"
-copy "$(SolutionDir)ObjectShader.fx" "$(SolutionDir)$(OutDir)ObjectShader.fx"
-copy "$(SolutionDir)ObjectShaderDebug.fx" "$(SolutionDir)$(OutDir)ObjectShaderDebug.fx"
-copy "$(SolutionDir)flower_config.json" "$(SolutionDir)$(OutDir)flower_config.json"
-copy "$(SolutionDir)grass_config.json" "$(SolutionDir)$(OutDir)grass_config.json"</Command>
+      <Command>Xcopy /E /I /Y "$(SolutionDir)DATA" "$(SolutionDir)$(OutDir)DATA"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

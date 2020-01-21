@@ -87,7 +87,7 @@ struct Material
 	std::string materialName = "";
 
 	float r, g, b, a = 1.0f;
-	std::string texturePath = "models/plastic_base.dds"; //placeholder blank texture
+	std::string texturePath = "DATA/ENV/GLOBAL/plastic_base.dds"; //placeholder blank texture
 };
 
 struct LoadedMaterial
