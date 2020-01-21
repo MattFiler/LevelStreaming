@@ -1,16 +1,22 @@
 #include "LevelScene.h"
 
-/* Init the objects in the scene */
-void LevelScene::Init()
+/* Load config files for level */
+LevelScene::LevelScene(std::string levelPath, bool frontendLevel) 
 {
+	level_path = levelPath;
+
 	//Parse commands JSON
-	std::fstream cmd_js("DATA\\ENV\\PRODUCTION\\TEST_LEVEL\\COMMANDS.JSON");
+	std::fstream cmd_js(level_path + "COMMANDS.JSON");
 	cmd_js >> commands_json;
 
 	//Parse models JSON
-	std::fstream mdl_js("DATA\\ENV\\PRODUCTION\\TEST_LEVEL\\MODELS_LEVEL.JSON");
+	std::fstream mdl_js(level_path + "MODELS_LEVEL.JSON");
 	mdl_js >> models_json;
+}
 
+/* Init the objects in the scene */
+void LevelScene::Init()
+{
 	//Load all zone metadata
 	for (int i = 0; i < commands_json["ZONES"].size(); i++) {
 		ZoneDef this_zone = ZoneDef();
@@ -39,7 +45,7 @@ void LevelScene::Init()
 	GameObjectManager::AddObject(&light_source);
 	GameObjectManager::AddObject(&main_cam);
 	GameObjectManager::Create();
-	main_cam.SetLocked(false);
+	main_cam.SetLocked(is_frontend);
 
 	//Position "player"
 	auto spawn_pos = commands_json["PLAYER_SPAWN"];
@@ -50,6 +56,8 @@ void LevelScene::Init()
 /* Release the objects in the scene */
 void LevelScene::Release()
 {
+	level_zones.clear();
+	level_models.clear();
 	GameObjectManager::Release();
 }
 
@@ -72,6 +80,9 @@ bool LevelScene::Update(double dt)
 #endif
 
 	ImGui::Separator();
+	ImGui::Text(("Level: " + level_path).c_str());
+
+	ImGui::Separator();
 	ImGui::Text(("Cam Pos X: " + std::to_string(main_cam.GetPosition().x) + ", Y: " + std::to_string(main_cam.GetPosition().y) + "Z: " + std::to_string(main_cam.GetPosition().z)).c_str());
 	ImGui::Text(("Cam Rot X: " + std::to_string(main_cam.GetRotation().x) + ", Y: " + std::to_string(main_cam.GetRotation().y) + "Z: " + std::to_string(main_cam.GetRotation().z)).c_str());
 
@@ -81,25 +92,19 @@ bool LevelScene::Update(double dt)
 	ImGui::SliderFloat("Ambient B", &dxshared::ambientLightColour.z, 0.0f, 1.0f);
 
 	ImGui::Separator();
-	if (ImGui::Button("Load Zone 1"))
-	{
-		LoadZone(0);
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Load Zone 2"))
-	{
-		LoadZone(1);
+	for (int i = 0; i < level_zones.size(); i++) {
+		if (ImGui::Button(("Load Zone " + std::to_string(i + 1)).c_str()))
+		{
+			LoadZone(i);
+		}
 	}
 
 	ImGui::Separator();
-	if (ImGui::Button("Unload Zone 1"))
-	{
-		UnloadZone(0);
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Unload Zone 2"))
-	{
-		UnloadZone(1);
+	for (int i = 0; i < level_zones.size(); i++) {
+		if (ImGui::Button(("Unload Zone " + std::to_string(i + 1)).c_str()))
+		{
+			UnloadZone(i);
+		}
 	}
 
 	ImGui::End();
@@ -129,7 +134,7 @@ void LevelScene::LoadZone(int id)
 			{
 				Debug::Log("Loading model: " + this_zone->models.at(i).modelName);
 				Model* new_model = new Model();
-				new_model->SetData(dxutils.LoadModel("DATA\\ENV\\PRODUCTION\\TEST_LEVEL\\" + level_models[x].modelPath));
+				new_model->SetData(dxutils.LoadModel(level_path + level_models[x].modelPath));
 				new_model->SetPosition(this_zone->models.at(i).position);
 				new_model->SetRotation(this_zone->models.at(i).rotation);
 				new_model->Create();

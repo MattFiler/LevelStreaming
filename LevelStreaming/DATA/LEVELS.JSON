@@ -1,6 +1,12 @@
 {
-	"TEST_LEVEL": {
-		"TYPE": "STD_LEVEL",
-		"PATH": "DATA/ENV/TEST_LEVEL"
-	}
+	"LEVELS": [
+		{
+			"TYPE": "FE_LEVEL",
+			"PATH": "DATA/ENV/PRODUCTION/FRONTEND/"
+		},
+		{
+			"TYPE": "STD_LEVEL",
+			"PATH": "DATA/ENV/PRODUCTION/TEST_LEVEL/"
+		}
+	]
 }

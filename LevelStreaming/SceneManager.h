@@ -33,6 +33,6 @@ private:
 	int currentSceneIndex = -1;
 	std::vector<Scene*> availableScenes = std::vector<Scene*>();
 
-	LevelScene level_scene = LevelScene();
+	json levels_json;
 };
 

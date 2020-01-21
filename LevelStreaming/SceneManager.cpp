@@ -12,9 +12,15 @@ bool SceneManager::Init()
 {
 	bool dxInit = dxmain::Init();
 
-	AddScene(&level_scene);
-
-	ChangeScene(0); 
+	//Parse levels JSON & load all into LevelScene
+	std::fstream lvl_js("DATA\\LEVELS.JSON");
+	lvl_js >> levels_json;
+	for (int i = 0; i < levels_json["LEVELS"].size(); i++) {
+		bool fe_level = (levels_json["LEVELS"][i]["TYPE"] == "FE_LEVEL");
+		LevelScene* level_scene = new LevelScene(levels_json["LEVELS"][i]["PATH"], fe_level);
+		AddScene(level_scene);
+		if (fe_level) ChangeScene(i);
+	}
 
 	return dxInit;
 }
@@ -41,22 +47,15 @@ bool SceneManager::Update(double dt)
 	ImGui::SetNextWindowPos(ImVec2(0, 685));
 	ImGui::SetNextWindowSize(ImVec2(950, 35));
 	ImGui::Begin("Editor", &open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus);
-	/*
-	if (ImGui::Button("Bush Generator"))
-	{
-		ChangeScene(1);
+
+	for (int i = 0; i < availableScenes.size(); i++) {
+		if (ImGui::Button(("Scene " + std::to_string(i)).c_str()))
+		{
+			ChangeScene(i);
+		}
+		ImGui::SameLine();
 	}
-	ImGui::SameLine();
-	if (ImGui::Button("Flower Generator"))
-	{
-		ChangeScene(2);
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Grass Generator"))
-	{
-		ChangeScene(3);
-	}
-	*/
+
 	ImGui::End();
 	
 	//Update current scene
