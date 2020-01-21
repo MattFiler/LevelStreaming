@@ -12,7 +12,7 @@ bool SceneManager::Init()
 {
 	bool dxInit = dxmain::Init();
 
-	AddScene(&test_scene);
+	AddScene(&level_scene);
 
 	ChangeScene(0); 
 

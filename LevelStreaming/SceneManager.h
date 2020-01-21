@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dxmain.h"
-#include "TestScene.h"
+#include "LevelScene.h"
 
 class Scene;
 
@@ -33,6 +33,6 @@ private:
 	int currentSceneIndex = -1;
 	std::vector<Scene*> availableScenes = std::vector<Scene*>();
 
-	TestScene test_scene = TestScene();
+	LevelScene level_scene = LevelScene();
 };
 

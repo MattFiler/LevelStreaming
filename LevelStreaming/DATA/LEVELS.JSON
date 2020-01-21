@@ -1,0 +1,6 @@
+{
+	"TEST_LEVEL": {
+		"TYPE": "STD_LEVEL",
+		"PATH": "DATA/ENV/TEST_LEVEL"
+	}
+}

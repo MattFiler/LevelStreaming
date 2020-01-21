@@ -115,6 +115,22 @@ struct Face
 	std::string materialName = ""; //Material name to link with MTL
 };
 
+struct ModelDef {
+	std::string modelName = "";
+	std::string modelPath = "";
+};
+
+struct ModelPlacement {
+	std::string modelName = "";
+	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0,0,0);
+	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
+};
+class Model;
+struct ZoneDef {
+	std::vector<ModelPlacement> models = std::vector<ModelPlacement>();
+	std::vector<Model*> loadedModels = std::vector<Model*>(); //Set per level to track assets to unload
+};
+
 /* Debug logger */
 class Debug
 {

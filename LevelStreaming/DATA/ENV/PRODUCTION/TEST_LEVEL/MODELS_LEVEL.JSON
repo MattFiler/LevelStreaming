@@ -1,0 +1,12 @@
+{
+	"MODELS": [
+		{
+			"NAME": "TEST_MODEL",
+			"PATH": "RENDERABLE/test.obj"
+		},
+		{
+			"NAME": "NODDING_BIRD_MAIN",
+			"PATH": "RENDERABLE/bird_main.obj"
+		}
+	]
+}
