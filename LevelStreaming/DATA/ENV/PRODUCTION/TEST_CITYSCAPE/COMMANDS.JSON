@@ -1,0 +1,83 @@
+{
+	"ZONES": [
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_WORLD_TILE",
+					"PLACEMENT": {
+						"POSITION": [0, 0, 0],
+						"ROTATION": [0, 0, 0]
+					}
+				}
+			],
+			"BOUNDS": [
+				[-2,-1,-2], 
+				[2,50,2]
+			]
+		},
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_WORLD_TILE",
+					"PLACEMENT": {
+						"POSITION": [4, 0, 4],
+						"ROTATION": [0, 0, 0]
+					}
+				}
+			],
+			"BOUNDS": [
+				[2,-1,2], 
+				[6,50,6]
+			]
+		},
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_WORLD_TILE",
+					"PLACEMENT": {
+						"POSITION": [-4, 0, -4],
+						"ROTATION": [0, 0, 0]
+					}
+				}
+			],
+			"BOUNDS": [
+				[-2,-1,-2], 
+				[-6,50,-6]
+			]
+		},
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_WORLD_TILE",
+					"PLACEMENT": {
+						"POSITION": [0, 0, -4],
+						"ROTATION": [0, 0, 0]
+					}
+				}
+			],
+			"BOUNDS": [
+				[-2,-1,-2], 
+				[2,50,-6]
+			]
+		},
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_WORLD_TILE",
+					"PLACEMENT": {
+						"POSITION": [-4, 0, 0],
+						"ROTATION": [0, 0, 0]
+					}
+				}
+			],
+			"BOUNDS": [
+				[-2,-1,-2], 
+				[-6,50,2]
+			]
+		}
+	],
+	"PLAYER_SPAWN": {
+		"POSITION": [0, 0, 0],
+		"ROTATION": [0, 0, 0]
+	}
+}

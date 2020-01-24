@@ -9,6 +9,16 @@
 			"NAME": "Test Level",
 			"TYPE": "STD_LEVEL",
 			"PATH": "DATA/ENV/PRODUCTION/TEST_LEVEL/"
+		},
+		{
+			"NAME": "Test Cityscape",
+			"TYPE": "STD_LEVEL",
+			"PATH": "DATA/ENV/PRODUCTION/TEST_CITYSCAPE/"
+		},
+		{
+			"NAME": "Test Corridor",
+			"TYPE": "STD_LEVEL",
+			"PATH": "DATA/ENV/PRODUCTION/TEST_CORRIDOR/"
 		}
 	]
 }

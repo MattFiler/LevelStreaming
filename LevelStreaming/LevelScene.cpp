@@ -105,24 +105,6 @@ bool LevelScene::Update(double dt)
 	ImGui::SliderFloat("Ambient G", &dxshared::ambientLightColour.y, 0.0f, 1.0f);
 	ImGui::SliderFloat("Ambient B", &dxshared::ambientLightColour.z, 0.0f, 1.0f);
 
-	ImGui::Separator();
-	for (int i = 0; i < level_zones.size(); i++)
-	{
-		if (ImGui::Button(("Load Zone " + std::to_string(i + 1)).c_str()))
-		{
-			LoadZone(i);
-		}
-	}
-
-	ImGui::Separator();
-	for (int i = 0; i < level_zones.size(); i++) 
-	{
-		if (ImGui::Button(("Unload Zone " + std::to_string(i + 1)).c_str()))
-		{
-			UnloadZone(i);
-		}
-	}
-
 	ImGui::End();
 
 	//As zones are loaded on a separate thread, wait to see if the loading is done, and add the object references if so
