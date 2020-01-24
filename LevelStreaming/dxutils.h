@@ -20,6 +20,7 @@
 #include <vector>
 #include <fstream>
 #include <thread>
+#include <mutex>
 
 #include <time.h>
 #include <random>
@@ -143,9 +144,14 @@ struct ModelPlacement {
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
 };
 class Model;
+class BoundingBox;
 struct ZoneDef {
+	bool isLoading = false;
+	bool isLoaded = false;
 	std::vector<ModelPlacement> models = std::vector<ModelPlacement>();
 	std::vector<Model*> loadedModels = std::vector<Model*>(); //Set per level to track assets to unload
+	std::mutex mutex;
+	BoundingBox* zoneBounds = nullptr;
 };
 
 /* Debug logger */

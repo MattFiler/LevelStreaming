@@ -1,23 +1,35 @@
 {
 	"ZONES": [
-		[
-			{
-				"MODEL": "TEST_MODEL",
-				"PLACEMENT": {
-					"POSITION": [0, 0, 0],
-					"ROTATION": [0, 0, 0]
+		{
+			"CONTENT": [
+				{
+					"MODEL": "TEST_MODEL",
+					"PLACEMENT": {
+						"POSITION": [0, 0, 0],
+						"ROTATION": [0, 0, 0]
+					}
 				}
-			}
-		],
-		[
-			{
-				"MODEL": "NODDING_BIRD_MAIN",
-				"PLACEMENT": {
-					"POSITION": [1, 1, 1],
-					"ROTATION": [0, 0, 0]
+			],
+			"BOUNDS": [
+				[-1,-1,-1], 
+				[1,1,1]
+			]
+		},
+		{
+			"CONTENT": [
+				{
+					"MODEL": "NODDING_BIRD_MAIN",
+					"PLACEMENT": {
+						"POSITION": [-1.5, -1.5, -1.5],
+						"ROTATION": [0, 0, 0]
+					}
 				}
-			}
-		]
+			],
+			"BOUNDS": [
+				[-2,-2,-2],
+				[-1,-1,-1]
+			]
+		}
 	],
 	"PLAYER_SPAWN": {
 		"POSITION": [0, 0, 0],

@@ -22,16 +22,22 @@ void LevelScene::Init()
 	//Load all zone metadata
 	for (int i = 0; i < commands_json["ZONES"].size(); i++) 
 	{
-		ZoneDef this_zone = ZoneDef();
-		for (int x = 0; x < commands_json["ZONES"][i].size(); x++)
+		ZoneDef* this_zone = new ZoneDef();
+		for (int x = 0; x < commands_json["ZONES"][i]["CONTENT"].size(); x++)
 		{
-			auto this_placement_json = commands_json["ZONES"][i][x];
+			auto this_placement_json = commands_json["ZONES"][i]["CONTENT"][x];
 			ModelPlacement this_placement = ModelPlacement();
 			this_placement.modelName = this_placement_json["MODEL"].get<std::string>();
 			this_placement.position = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["POSITION"][0], this_placement_json["PLACEMENT"]["POSITION"][1], this_placement_json["PLACEMENT"]["POSITION"][2]);
 			this_placement.rotation = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["ROTATION"][0], this_placement_json["PLACEMENT"]["ROTATION"][1], this_placement_json["PLACEMENT"]["ROTATION"][2]);
-			this_zone.models.push_back(this_placement);
+			this_zone->models.push_back(this_placement);
 		}
+		this_zone->zoneBounds = new BoundingBox();
+		this_zone->zoneBounds->SetDims(
+			DirectX::XMFLOAT3(commands_json["ZONES"][i]["BOUNDS"][0][0], commands_json["ZONES"][i]["BOUNDS"][0][1], commands_json["ZONES"][i]["BOUNDS"][0][2]),
+			DirectX::XMFLOAT3(commands_json["ZONES"][i]["BOUNDS"][1][0], commands_json["ZONES"][i]["BOUNDS"][1][1], commands_json["ZONES"][i]["BOUNDS"][1][2])
+		);
+		GameObjectManager::AddObject(this_zone->zoneBounds); 
 		level_zones.push_back(this_zone);
 	}
 
@@ -61,6 +67,9 @@ void LevelScene::Init()
 /* Release the objects in the scene */
 void LevelScene::Release()
 {
+	for (int i = 0; i < level_zones.size(); i++) {
+		delete level_zones.at(i);
+	}
 	level_zones.clear();
 	level_models.clear();
 	GameObjectManager::Release();
@@ -119,23 +128,20 @@ bool LevelScene::Update(double dt)
 	//As zones are loaded on a separate thread, wait to see if the loading is done, and add the object references if so
 	//We don't add the object references on the thread, as it may happen at a time between update and render, causing issues
 	for (int i = 0; i < zone_load_queue.size(); i++) {
-		ZoneLoadQueue* this_thread = &zone_load_queue.at(i);
-		if (this_thread->completed || this_thread->executing) continue;
-		for (int i = 0; i < level_zones.at(this_thread->zoneID).loadedModels.size(); i++)
+		if (!level_zones[zone_load_queue.at(i)]->isLoaded) continue;
+		for (int x = 0; x < level_zones[zone_load_queue.at(i)]->loadedModels.size(); x++)
 		{
-			GameObjectManager::AddObject(level_zones.at(this_thread->zoneID).loadedModels.at(i));
+			GameObjectManager::AddObject(level_zones[zone_load_queue.at(i)]->loadedModels.at(x));
 		}
-		this_thread->threadOperation->join();
-		this_thread->completed = true;
 		should_update_queue = true;
-		Debug::Log("Load of zone " + std::to_string(this_thread->zoneID) + " complete!");
+		Debug::Log("Load of zone " + std::to_string(zone_load_queue.at(i)) + " complete!");
 	}
 
-	//If a thread finished, remove it from the queue
+	//If a threaded zone load operation finished, remove it from the queue
 	if (should_update_queue) {
-		std::vector<ZoneLoadQueue> new_zone_load_queue = std::vector<ZoneLoadQueue>();
+		std::vector<int> new_zone_load_queue = std::vector<int>();
 		for (int i = 0; i < zone_load_queue.size(); i++) {
-			if (zone_load_queue.at(i).completed) continue;
+			if (level_zones[zone_load_queue.at(i)]->isLoaded) continue;
 			new_zone_load_queue.push_back(zone_load_queue.at(i));
 		}
 		zone_load_queue = new_zone_load_queue;
@@ -143,6 +149,21 @@ bool LevelScene::Update(double dt)
 
 	main_cam.SetLocked(camLock);
 	GameObjectManager::Update(dt);
+
+	//Check to see if the camera (player) has entered a zone - call to load if it has
+	for (int i = 0; i < level_zones.size(); i++) {
+		if (level_zones.at(i)->zoneBounds->ContainsPoint(main_cam.GetPosition())) {
+			if (!IsZoneLoaded(i)) {
+				LoadZone(i);
+			}
+		}
+		else
+		{
+			if (IsZoneLoaded(i)) {
+				UnloadZone(i);
+			}
+		}
+	}
 
 	return true;
 }
@@ -156,50 +177,45 @@ void LevelScene::Render(double dt)
 /* Is the zone ID loaded? */
 bool LevelScene::IsZoneLoaded(int id)
 {
-	return (level_zones.at(id).loadedModels.size() != 0);
+	return (level_zones.at(id)->isLoading || level_zones.at(id)->isLoaded);
 }
 
 /* Load a zone by ID (threaded) */
 void LevelScene::LoadZone(int id)
 {
 	if (IsZoneLoaded(id)) {
-		Debug::Log("Requested load of zone " + std::to_string(id) + ", but it's already loaded!");
+		Debug::Log("Requested load of zone " + std::to_string(id) + ", but it's already loaded/loading!");
 		return;
 	}
 
 	Debug::Log("Starting load of zone " + std::to_string(id));
+	level_zones[id]->isLoading = true;
 	std::thread* load_models = new std::thread([id, this] { LoadZoneThread(id); });
-	ZoneLoadQueue this_load_thread = ZoneLoadQueue(load_models, id);
-	zone_load_queue.push_back(this_load_thread);
+	zone_load_queue.push_back(id);
 }
 void LevelScene::LoadZoneThread(int id)
 {
-	ZoneDef* this_zone = &level_zones[id];
-	for (int i = 0; i < this_zone->models.size(); i++)
+	for (int i = 0; i < level_zones[id]->models.size(); i++)
 	{
 		for (int x = 0; x < level_models.size(); x++)
 		{
-			if (level_models[x].modelName == this_zone->models.at(i).modelName)
+			if (level_models[x].modelName == level_zones[id]->models.at(i).modelName)
 			{
-				Debug::Log("Loading model: " + this_zone->models.at(i).modelName);
+				Debug::Log("Loading model: " + level_zones[id]->models.at(i).modelName);
 				Model* new_model = new Model();
 				new_model->SetData(dxutils.LoadModel(level_path + level_models[x].modelPath));
-				new_model->SetPosition(this_zone->models.at(i).position);
-				new_model->SetRotation(this_zone->models.at(i).rotation);
+				new_model->SetPosition(level_zones[id]->models.at(i).position);
+				new_model->SetRotation(level_zones[id]->models.at(i).rotation);
 				new_model->Create();
-				this_zone->loadedModels.push_back(new_model);
+				level_zones[id]->loadedModels.push_back(new_model);
 				break;
 			}
 		}
 	}
-
-	//Is this thread safe??
-	for (int i = 0; i < zone_load_queue.size(); i++) {
-		if (zone_load_queue.at(i).zoneID == id) {
-			zone_load_queue.at(i).executing = false;
-			break;
-		}
-	}
+	level_zones[id]->mutex.lock();
+	level_zones[id]->isLoading = false;
+	level_zones[id]->isLoaded = true;
+	level_zones[id]->mutex.unlock();
 }
 
 /* Unload a zone by ID */
@@ -210,11 +226,11 @@ void LevelScene::UnloadZone(int id)
 		return;
 	}
 
-	ZoneDef* this_zone = &level_zones[id];
 	Debug::Log("Un-loading zone " + std::to_string(id));
-	for (int i = 0; i < this_zone->loadedModels.size(); i++)
+	for (int i = 0; i < level_zones[id]->loadedModels.size(); i++)
 	{
-		GameObjectManager::RemoveObject(this_zone->loadedModels[i]);
+		GameObjectManager::RemoveObject(level_zones[id]->loadedModels[i]);
 	}
-	this_zone->loadedModels.clear();
+	level_zones[id]->loadedModels.clear();
+	level_zones[id]->isLoaded = false;
 }

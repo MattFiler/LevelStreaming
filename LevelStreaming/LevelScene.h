@@ -35,10 +35,10 @@ private:
 	Camera main_cam;
 	Light light_source;
 
-	std::vector<ZoneDef> level_zones = std::vector<ZoneDef>();
+	std::vector<ZoneDef*> level_zones = std::vector<ZoneDef*>();
 	std::vector<ModelDef> level_models = std::vector<ModelDef>();
 
 	bool should_update_queue = false;
-	std::vector<ZoneLoadQueue> zone_load_queue = std::vector<ZoneLoadQueue>();
+	std::vector<int> zone_load_queue = std::vector<int>();
 };
 

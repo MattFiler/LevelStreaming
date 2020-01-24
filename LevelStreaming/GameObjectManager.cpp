@@ -1,6 +1,8 @@
 #include "GameObjectManager.h"
 #include "GameObject.h"
 #include "Light.h"
+#include "Model.h"
+#include "BoundingBox.h"
 
 std::vector<GameObject*> GameObjectManager::allGameObjects = std::vector<GameObject*>();
 
@@ -25,6 +27,30 @@ std::vector<Light*> GameObjectManager::GetLights()
 		}
 	}
 	return allLights;
+}
+
+/* Get all models in the current game object pool */
+std::vector<Model*> GameObjectManager::GetModels()
+{
+	std::vector<Model*> allModels = std::vector<Model*>();
+	for (int i = 0; i < allGameObjects.size(); i++) {
+		if (dynamic_cast<Model*>(allGameObjects[i])) {
+			allModels.push_back(dynamic_cast<Model*>(allGameObjects[i]));
+		}
+	}
+	return allModels;
+}
+
+/* Get all bounding boxes in the current game object pool */
+std::vector<BoundingBox*> GameObjectManager::GetBoundingBoxes()
+{
+	std::vector<BoundingBox*> allBoundingBoxes = std::vector<BoundingBox*>();
+	for (int i = 0; i < allGameObjects.size(); i++) {
+		if (dynamic_cast<BoundingBox*>(allGameObjects[i])) {
+			allBoundingBoxes.push_back(dynamic_cast<BoundingBox*>(allGameObjects[i]));
+		}
+	}
+	return allBoundingBoxes;
 }
 
 /* Run "Create()" on all gameobjects in the pool */

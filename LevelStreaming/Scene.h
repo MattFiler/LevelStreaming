@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Light.h"
+#include "BoundingBox.h"
 
 #include "nlohmann/json.hpp"
 using json = nlohmann::json;

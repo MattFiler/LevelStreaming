@@ -4,6 +4,8 @@
 
 class GameObject;
 class Light;
+class Model;
+class BoundingBox;
 
 class GameObjectManager
 {
@@ -19,6 +21,8 @@ public:
 	static void RemoveObject(GameObject* _aLight);
 
 	static std::vector<Light*> GetLights();
+	static std::vector<Model*> GetModels();
+	static std::vector<BoundingBox*> GetBoundingBoxes();
 
 	static void Create();
 	static void Release();
