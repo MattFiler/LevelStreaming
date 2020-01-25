@@ -17,7 +17,7 @@ public:
 		return level_name;
 	}
 
-private:
+protected:
 	bool IsZoneLoaded(int id);
 	void LoadZone(int id);
 	void LoadZoneThread(int id);

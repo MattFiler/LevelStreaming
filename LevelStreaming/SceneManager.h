@@ -1,9 +1,7 @@
 #pragma once
 
 #include "dxmain.h"
-#include "LevelScene.h"
-
-class Scene;
+#include "EditorScene.h"
 
 class SceneManager : public dxmain
 {

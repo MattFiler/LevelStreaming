@@ -27,8 +27,13 @@
     <ClCompile Include="dxmain.cpp" />
     <ClCompile Include="dxshared.cpp" />
     <ClCompile Include="dxutils.cpp" />
+    <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
+    <ClCompile Include="imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="imguizmo\ImGradient.cpp" />
+    <ClCompile Include="imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="imguizmo\ImSequencer.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx11.cpp" />
@@ -51,8 +56,13 @@
     <ClInclude Include="dxmain.h" />
     <ClInclude Include="dxshared.h" />
     <ClInclude Include="dxutils.h" />
+    <ClInclude Include="EditorScene.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameObjectManager.h" />
+    <ClInclude Include="imguizmo\ImCurveEdit.h" />
+    <ClInclude Include="imguizmo\ImGradient.h" />
+    <ClInclude Include="imguizmo\ImGuizmo.h" />
+    <ClInclude Include="imguizmo\ImSequencer.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_dx11.h" />

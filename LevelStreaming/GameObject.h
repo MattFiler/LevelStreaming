@@ -66,6 +66,28 @@ public:
 		return isInvisible;
 	}
 
+	XMMATRIX GetWorldMatrix() {
+		return mWorld;
+	}
+	XMFLOAT4X4 GetWorldMatrix4X4() {
+		XMFLOAT4X4 temp;
+		DirectX::XMStoreFloat4x4(&temp, mWorld);
+		return temp;
+	}
+
+	void SetWorldMatrix(XMMATRIX newWorld) {
+		DirectX::XMVECTOR position_v;
+		DirectX::XMVECTOR rotation_v;
+		DirectX::XMVECTOR scale_v;
+		DirectX::XMMatrixDecompose(&scale_v, &rotation_v, &position_v, newWorld);
+		DirectX::XMStoreFloat3(&position, position_v);
+		DirectX::XMStoreFloat3(&rotation, rotation_v);
+		DirectX::XMStoreFloat3(&scale, scale_v);
+	}
+	void SetWorldMatrix4X4(XMFLOAT4X4 newWorld) {
+		SetWorldMatrix(DirectX::XMLoadFloat4x4(&newWorld));
+	}
+
 protected:
 	XMMATRIX mWorld;
 

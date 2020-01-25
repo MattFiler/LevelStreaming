@@ -34,6 +34,12 @@
     <Filter Include="Header Files\nlohmann">
       <UniqueIdentifier>{735155ad-9576-4c13-8cf7-e5717cbd627b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ImGuizmo">
+      <UniqueIdentifier>{8cfeeb4e-cc56-4d22-a601-c4a4b1abf534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ImGuizmo">
+      <UniqueIdentifier>{be34651f-f4a8-49d8-8838-cc362ed691c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="winmain.cpp">
@@ -101,6 +107,21 @@
     </ClCompile>
     <ClCompile Include="BoundingBox.cpp">
       <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="imguizmo\ImGuizmo.cpp">
+      <Filter>Source Files\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorScene.cpp">
+      <Filter>Source Files\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="imguizmo\ImCurveEdit.cpp">
+      <Filter>Source Files\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="imguizmo\ImGradient.cpp">
+      <Filter>Source Files\ImGuizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="imguizmo\ImSequencer.cpp">
+      <Filter>Source Files\ImGuizmo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -184,6 +205,21 @@
     </ClInclude>
     <ClInclude Include="BoundingBox.h">
       <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImGuizmo.h">
+      <Filter>Header Files\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorScene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImSequencer.h">
+      <Filter>Header Files\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImCurveEdit.h">
+      <Filter>Header Files\ImGuizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImGradient.h">
+      <Filter>Header Files\ImGuizmo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,6 +5,11 @@
 #pragma comment(lib, "d3d11.lib")
 #include <DirectXMath.h>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imguizmo/ImGuizmo.h"
+
 struct dxshared 
 {
 public:
@@ -20,4 +25,7 @@ public:
 	static DirectX::XMFLOAT4 ambientLightColour;
 
 	static bool enableDebug;
+
+	static ImGuizmo::OPERATION mCurrentGizmoOperation;
+	static ImGuizmo::MODE mCurrentGizmoMode;
 };

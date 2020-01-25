@@ -57,6 +57,7 @@ void LevelScene::Init()
 	GameObjectManager::AddObject(&main_cam);
 	GameObjectManager::Create();
 	main_cam.SetLocked(level_type == LevelType::FE_LEVEL);
+	light_source.SetPosition(DirectX::XMFLOAT3(0.5, 0.5, 0.5));
 
 	//Position "player"
 	auto spawn_pos = commands_json["PLAYER_SPAWN"];

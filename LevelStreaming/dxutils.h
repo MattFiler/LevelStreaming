@@ -12,10 +12,6 @@
 #include "DDSTextureLoader.h"
 #include "InputHandler.h"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_win32.h"
-#include "imgui/imgui_impl_dx11.h"
-
 #include <string>
 #include <vector>
 #include <fstream>
@@ -214,6 +210,14 @@ public:
 		if (pErrorBlob) pErrorBlob->Release();
 
 		return S_OK;
+	}
+
+	/* Convert a DirectX Matrix to Float4X4 */
+	XMFLOAT4X4 MatrixToFloat4x4(XMMATRIX mat)
+	{
+		XMFLOAT4X4 temp;
+		XMStoreFloat4x4(&temp, mat);
+		return temp;
 	}
 
 	/* Load a model and return its indices and vertexes (todo: make it condense the vertex array) */
