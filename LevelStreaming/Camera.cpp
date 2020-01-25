@@ -20,8 +20,9 @@ void Camera::Update(float dt)
 	GameObject::Update(dt);
 
 	if (!isActive) return;
-	dxshared::mView = mWorld;
-	//dxshared::mView = XMMatrixScaling(scale.x, scale.y, scale.z) * XMMatrixTranslation(position.x, position.y, position.z) * XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z);
+
+	camTarget = DirectX::XMLoadFloat3(&position) + XMVector3Normalize(XMVector3TransformCoord(DefaultForward, XMMatrixRotationRollPitchYaw(rotation.x, rotation.z, rotation.y)));
+	dxshared::mView = XMMatrixLookAtLH(DirectX::XMLoadFloat3(&position), camTarget, camUp);
 
 	if (dxshared::enableDebug && InputHandler::KeyPressed(WindowsKey::O)) {
 		Debug::Log("Camera position = X:" + std::to_string(GameObject::GetPosition().x) + ", Y:" + std::to_string(GameObject::GetPosition().y) + ", Z:" + std::to_string(GameObject::GetPosition().z));
@@ -51,22 +52,16 @@ void Camera::Update(float dt)
 	if (InputHandler::KeyPressed(WindowsKey::X)) {
 		GameObject::SetPosition(XMFLOAT3(GameObject::GetPosition().x, GameObject::GetPosition().y - moveSpeed, GameObject::GetPosition().z));
 	}
-	if (InputHandler::KeyPressed(WindowsKey::C)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y - dt, GameObject::GetRotation().z));
-	}
-	if (InputHandler::KeyPressed(WindowsKey::V)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y + dt, GameObject::GetRotation().z));
-	}
-	if (InputHandler::KeyPressed(WindowsKey::R)) {
+	if (InputHandler::KeyPressed(WindowsKey::Q)) {
 		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z - dt));
 	}
-	if (InputHandler::KeyPressed(WindowsKey::F)) {
+	if (InputHandler::KeyPressed(WindowsKey::E)) {
 		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z + dt));
 	}
-	if (InputHandler::KeyPressed(WindowsKey::E)) {
+	if (InputHandler::KeyPressed(WindowsKey::F)) {
 		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x - dt, GameObject::GetRotation().y, GameObject::GetRotation().z));
 	}
-	if (InputHandler::KeyPressed(WindowsKey::Q)) {
+	if (InputHandler::KeyPressed(WindowsKey::V)) {
 		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x + dt, GameObject::GetRotation().y, GameObject::GetRotation().z));
 	}
 }
