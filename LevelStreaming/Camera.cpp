@@ -32,7 +32,7 @@ void Camera::Update(float dt)
 	if (isLocked) return;
 	double moveSpeed = dt;
 	if (InputHandler::KeyPressed(WindowsKey::SHIFT)) {
-		moveSpeed *= 4;
+		moveSpeed *= 20;
 	}
 	if (InputHandler::KeyPressed(WindowsKey::W)) {
 		GameObject::SetPosition(XMFLOAT3(GameObject::GetPosition().x, GameObject::GetPosition().y, GameObject::GetPosition().z - moveSpeed));

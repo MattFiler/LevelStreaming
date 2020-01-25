@@ -34,6 +34,8 @@ void BoundingBox::SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr)
 
 	localBottomLeft = DirectX::XMFLOAT3(-x_out, -y_out, -z_out);
 	localTopRight = DirectX::XMFLOAT3(x_out, y_out, z_out);
+
+	SetScale(DirectX::XMFLOAT3(x_out * 2, y_out * 2, z_out * 2));
 }
 
 /* Is a point inside the bounding box in world space? */

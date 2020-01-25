@@ -150,6 +150,11 @@ struct ZoneDef {
 	BoundingBox* zoneBounds = nullptr;
 };
 
+struct BoundsPair {
+	DirectX::XMFLOAT3 bottomLeft;
+	DirectX::XMFLOAT3 topRight;
+};
+
 /* Debug logger */
 class Debug
 {

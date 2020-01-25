@@ -13,6 +13,8 @@ public:
 	void Update(float dt) override;
 	void Render(float dt) override;
 
+	void SetRotation(XMFLOAT3 _rot) override {} //Bounding boxes don't currently support rotation
+
 	void SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr);
 	bool ContainsPoint(DirectX::XMFLOAT3 _p);
 
