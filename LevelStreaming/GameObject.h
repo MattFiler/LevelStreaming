@@ -80,9 +80,17 @@ public:
 		DirectX::XMVECTOR rotation_v;
 		DirectX::XMVECTOR scale_v;
 		DirectX::XMMatrixDecompose(&scale_v, &rotation_v, &position_v, newWorld);
-		DirectX::XMStoreFloat3(&position, position_v);
-		DirectX::XMStoreFloat3(&rotation, rotation_v);
-		DirectX::XMStoreFloat3(&scale, scale_v);
+
+		DirectX::XMFLOAT3 position_i;
+		DirectX::XMStoreFloat3(&position_i, position_v);
+		DirectX::XMFLOAT3 rotation_i;
+		DirectX::XMStoreFloat3(&rotation_i, rotation_v);
+		DirectX::XMFLOAT3 scale_i;
+		DirectX::XMStoreFloat3(&scale_i, scale_v);
+
+		SetPosition(position_i);
+		SetRotation(rotation_i);
+		SetScale(scale_i);
 	}
 	void SetWorldMatrix4X4(XMFLOAT4X4 newWorld) {
 		SetWorldMatrix(DirectX::XMLoadFloat4x4(&newWorld));

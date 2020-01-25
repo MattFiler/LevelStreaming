@@ -3,15 +3,19 @@
 /* Load config files for level */
 EditorScene::EditorScene(std::string levelName, std::string levelPath, LevelType levelType) : LevelScene(levelName, levelPath, levelType)
 {
-	
+	in_editor_mode = true;
 }
 
 /* Init the objects in the scene */
 void EditorScene::Init()
 {
 	LevelScene::Init();
-	for (int i = 0; i < level_zones.size(); i++) {
 
+	//Force-load all zones at all times in editor
+	for (int i = 0; i < level_zones.size(); i++) {
+		if (!IsZoneLoaded(i)) {
+			LoadZone(i);
+		}
 	}
 }
 
@@ -24,7 +28,51 @@ void EditorScene::Release()
 /* Update the objects in the scene */
 bool EditorScene::Update(double dt)
 {
-	float* objectMatrix = &light_source.GetWorldMatrix4X4().m[0][0];
+	LevelScene::Update(dt);
+
+	ImGui::Begin(LevelScene::GetName().c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+	if (ImGui::Button("Add New Zone")) {
+		ZoneDef* newZone = new ZoneDef();
+		newZone->zoneBounds = new BoundingBox();
+		GameObjectManager::AddObject(newZone->zoneBounds);
+		level_zones.push_back(newZone);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Remove Selected Zone")) {
+
+	}
+	ImGui::Separator();
+	if (ImGui::CollapsingHeader("Zones In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
+		for (int x = 0; x < level_zones.size(); x++) {
+			ImGui::RadioButton(("Zone " + std::to_string(x)).c_str(), &selectedEditZone, x);
+		}
+	}
+	ImGui::Separator();
+	if (ImGui::Button("Add New Model")) {
+		
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Remove Selected Model")) {
+		
+	}
+	if (ImGui::CollapsingHeader(("Zone " + std::to_string(selectedEditZone) + " Models").c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (!(level_zones.size() <= selectedEditZone)) {
+			for (int x = 0; x < level_zones.at(selectedEditZone)->models.size(); x++) {
+				ImGui::RadioButton(level_zones.at(selectedEditZone)->models.at(x).modelName.c_str(), &selectedEditModel, x);
+			}
+		}
+		else
+		{
+			selectedEditZone = 0;
+		}
+	}
+	ImGui::End();
+
+	if (level_zones.size() <= selectedEditZone) return true;
+	if (level_zones.at(selectedEditZone)->loadedModels.size() <= selectedEditModel) return true;
+	GameObject* objectToEdit = level_zones.at(selectedEditZone)->loadedModels.at(selectedEditModel);
+
+	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
 	float* projMatrix = &dxutils.MatrixToFloat4x4(dxshared::mProjection).m[0][0];
 	float* viewMatrix = &dxutils.MatrixToFloat4x4(dxshared::mView).m[0][0];
 
@@ -50,9 +98,7 @@ bool EditorScene::Update(double dt)
 	ImGui::InputFloat3("Sc", matrixScale, 3);
 	ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, objectMatrix);
 
-	light_source.SetWorldMatrix4X4(DirectX::XMFLOAT4X4(objectMatrix));
-
-	LevelScene::Update(dt);
+	objectToEdit->SetWorldMatrix4X4(DirectX::XMFLOAT4X4(objectMatrix));
 
 	return true;
 }

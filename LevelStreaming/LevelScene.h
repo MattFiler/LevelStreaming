@@ -32,6 +32,8 @@ protected:
 	json commands_json;
 	json models_json;
 
+	bool in_editor_mode = false;
+
 	Camera main_cam;
 	Light light_source;
 

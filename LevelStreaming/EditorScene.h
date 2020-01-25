@@ -15,5 +15,7 @@ public:
 
 private:
 	float identityMatrix[16] = { 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f };
+	int selectedEditZone = 0;
+	int selectedEditModel = 0;
 };
 

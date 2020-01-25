@@ -133,17 +133,19 @@ bool LevelScene::Update(double dt)
 	main_cam.SetLocked(camLock);
 	GameObjectManager::Update(dt);
 
-	//Check to see if the camera (player) has entered a zone - call to load if it has
-	for (int i = 0; i < level_zones.size(); i++) {
-		if (level_zones.at(i)->zoneBounds->ContainsPoint(main_cam.GetPosition())) {
-			if (!IsZoneLoaded(i)) {
-				LoadZone(i);
+	if (!in_editor_mode) {
+		//Check to see if the camera (player) has entered a zone - call to load if it has
+		for (int i = 0; i < level_zones.size(); i++) {
+			if (level_zones.at(i)->zoneBounds->ContainsPoint(main_cam.GetPosition())) {
+				if (!IsZoneLoaded(i)) {
+					LoadZone(i);
+				}
 			}
-		}
-		else
-		{
-			if (IsZoneLoaded(i)) {
-				UnloadZone(i);
+			else
+			{
+				if (IsZoneLoaded(i)) {
+					UnloadZone(i);
+				}
 			}
 		}
 	}
