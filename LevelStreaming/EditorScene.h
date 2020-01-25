@@ -14,10 +14,14 @@ public:
 	void Render(double dt) override;
 
 private:
+	json commands_json_out;
+
 	int selectedEditZone = 0;
 	int selectedEditModel = 0;
 	int editType = 0; //0 = zones, 1 = models
+
 	std::vector<Model*> allActiveModels = std::vector<Model*>(); //references to models not split into zones (done at compile time in editor)
+	std::vector<std::string> allActiveModelNames = std::vector<std::string>(); //names of models loaded, pulled from metadata
 	std::vector<BoundingBox*> allActiveZoneDummys = std::vector<BoundingBox*>(); //zone dummy objects that will be compiled as model parents
 };
 

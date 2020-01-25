@@ -6,7 +6,11 @@ LevelScene::LevelScene(std::string levelName, std::string levelPath, LevelType l
 	level_name = levelName;
 	level_path = levelPath;
 	level_type = levelType;
+}
 
+/* Init the objects in the scene */
+void LevelScene::Init()
+{
 	//Parse commands JSON
 	std::fstream cmd_js(level_path + "COMMANDS.JSON");
 	cmd_js >> commands_json;
@@ -14,11 +18,7 @@ LevelScene::LevelScene(std::string levelName, std::string levelPath, LevelType l
 	//Parse models JSON
 	std::fstream mdl_js(level_path + "MODELS_LEVEL.JSON");
 	mdl_js >> models_json;
-}
 
-/* Init the objects in the scene */
-void LevelScene::Init()
-{
 	//Load all zone metadata
 	for (int i = 0; i < commands_json["ZONES"].size(); i++) 
 	{
@@ -30,6 +30,7 @@ void LevelScene::Init()
 			this_placement.modelName = this_placement_json["MODEL"].get<std::string>();
 			this_placement.position = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["POSITION"][0], this_placement_json["PLACEMENT"]["POSITION"][1], this_placement_json["PLACEMENT"]["POSITION"][2]);
 			this_placement.rotation = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["ROTATION"][0], this_placement_json["PLACEMENT"]["ROTATION"][1], this_placement_json["PLACEMENT"]["ROTATION"][2]);
+			this_placement.scale = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["SCALE"][0], this_placement_json["PLACEMENT"]["SCALE"][1], this_placement_json["PLACEMENT"]["SCALE"][2]);
 			this_zone->models.push_back(this_placement);
 		}
 		this_zone->zoneBounds = new BoundingBox();
@@ -191,6 +192,7 @@ void LevelScene::LoadZoneThread(int id)
 				new_model->SetData(dxutils.LoadModel(level_path + level_models[x].modelPath));
 				new_model->SetPosition(level_zones[id]->models.at(i).position);
 				new_model->SetRotation(level_zones[id]->models.at(i).rotation);
+				new_model->SetScale(level_zones[id]->models.at(i).scale);
 				new_model->Create();
 				level_zones[id]->loadedModels.push_back(new_model);
 				break;

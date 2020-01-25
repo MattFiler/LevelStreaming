@@ -136,8 +136,9 @@ struct ModelDef {
 
 struct ModelPlacement {
 	std::string modelName = "";
-	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0,0,0);
+	DirectX::XMFLOAT3 position = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
+	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(0, 0, 0);
 };
 class Model;
 class BoundingBox;
@@ -151,8 +152,8 @@ struct ZoneDef {
 };
 
 struct BoundsPair {
-	DirectX::XMFLOAT3 bottomLeft;
-	DirectX::XMFLOAT3 topRight;
+	DirectX::XMFLOAT3 localBottomLeft;
+	DirectX::XMFLOAT3 localTopRight;
 };
 
 /* Debug logger */

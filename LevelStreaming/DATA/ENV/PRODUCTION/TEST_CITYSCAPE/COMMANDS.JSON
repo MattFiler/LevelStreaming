@@ -6,7 +6,8 @@
 					"MODEL": "TEST_WORLD_TILE",
 					"PLACEMENT": {
 						"POSITION": [0, 0, 0],
-						"ROTATION": [0, 0, 0]
+						"ROTATION": [0, 0, 0],
+						"SCALE": [1, 1, 1]
 					}
 				}
 			],
@@ -21,7 +22,8 @@
 					"MODEL": "TEST_WORLD_TILE",
 					"PLACEMENT": {
 						"POSITION": [4, 0, 4],
-						"ROTATION": [0, 0, 0]
+						"ROTATION": [0, 0, 0],
+						"SCALE": [1, 1, 1]
 					}
 				}
 			],
@@ -36,7 +38,8 @@
 					"MODEL": "TEST_WORLD_TILE",
 					"PLACEMENT": {
 						"POSITION": [-4, 0, -4],
-						"ROTATION": [0, 0, 0]
+						"ROTATION": [0, 0, 0],
+						"SCALE": [1, 1, 1]
 					}
 				}
 			],
@@ -51,7 +54,8 @@
 					"MODEL": "TEST_WORLD_TILE",
 					"PLACEMENT": {
 						"POSITION": [0, 0, -4],
-						"ROTATION": [0, 0, 0]
+						"ROTATION": [0, 0, 0],
+						"SCALE": [1, 1, 1]
 					}
 				}
 			],
@@ -66,7 +70,8 @@
 					"MODEL": "TEST_WORLD_TILE",
 					"PLACEMENT": {
 						"POSITION": [-4, 0, 0],
-						"ROTATION": [0, 0, 0]
+						"ROTATION": [0, 0, 0],
+						"SCALE": [1, 1, 1]
 					}
 				}
 			],

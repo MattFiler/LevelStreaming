@@ -23,6 +23,12 @@ public:
 	}
 
 	void SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr);
+	BoundsPair GetDims() {
+		BoundsPair dims = BoundsPair();
+		dims.localBottomLeft = localBottomLeft;
+		dims.localTopRight = localTopRight;
+		return dims;
+	}
 	bool ContainsPoint(DirectX::XMFLOAT3 _p);
 
 private:

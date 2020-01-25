@@ -18,12 +18,7 @@ bool SceneManager::Init()
 	for (int i = 0; i < levels_json["LEVELS"].size(); i++)
 	{
 		LevelType level_type = (levels_json["LEVELS"][i]["TYPE"] == "FE_LEVEL")?LevelType::FE_LEVEL:LevelType::STD_LEVEL;
-		LevelScene* level_scene = nullptr;
-#if _DEBUG
-		level_scene = new EditorScene(levels_json["LEVELS"][i]["NAME"], levels_json["LEVELS"][i]["PATH"], level_type);
-#else
-		level_scene = new LevelScene(levels_json["LEVELS"][i]["NAME"], levels_json["LEVELS"][i]["PATH"], level_type);
-#endif
+		LevelScene* level_scene = new EditorScene(levels_json["LEVELS"][i]["NAME"], levels_json["LEVELS"][i]["PATH"], level_type);
 		AddScene(level_scene);
 		if (level_type == LevelType::FE_LEVEL) ChangeScene(i);
 	}
