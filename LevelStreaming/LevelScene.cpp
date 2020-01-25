@@ -91,7 +91,7 @@ bool LevelScene::Update(double dt)
 	ImGui::Checkbox("Lock Camera", &camLock);
 #ifdef _DEBUG
 	ImGui::SameLine();
-	ImGui::Checkbox("Enable Debugging", &dxshared::enableDebug);
+	ImGui::Checkbox("Show Bounding Boxes", &dxshared::drawBoundingBoxes);
 #endif
 
 	ImGui::Separator();

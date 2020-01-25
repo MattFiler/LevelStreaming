@@ -13,7 +13,14 @@ public:
 	void Update(float dt) override;
 	void Render(float dt) override;
 
-	void SetRotation(XMFLOAT3 _rot) override {} //Bounding boxes don't currently support rotation
+	//Bounding boxes don't currently support rotation
+	void SetRotation(XMFLOAT3 _rot) override {
+		rotation = DirectX::XMFLOAT3(0, 0, 0);
+	}
+	void SetWorldMatrix(XMMATRIX newWorld) override {
+		GameObject::SetWorldMatrix(newWorld);
+		rotation = DirectX::XMFLOAT3(0, 0, 0);
+	}
 
 	void SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr);
 	bool ContainsPoint(DirectX::XMFLOAT3 _p);
@@ -21,4 +28,17 @@ public:
 private:
 	DirectX::XMFLOAT3 localBottomLeft = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT3 localTopRight = DirectX::XMFLOAT3(0, 0, 0);
+
+#ifdef _DEBUG
+	ID3D11Buffer* GO_ConstantBuffer = nullptr;
+	ID3D11Buffer* GO_VertexBuffer = nullptr;
+	ID3D11Buffer* GO_IndexBuffer = nullptr;
+	ID3D11SamplerState* g_pSamplerLinear = nullptr;
+	ID3D11ShaderResourceView* materialTexture = nullptr;
+	ID3D11VertexShader* GO_VertexShader = nullptr;
+	ID3D11PixelShader* GO_PixelShader = nullptr;
+	ID3D11InputLayout* GO_VertLayout = nullptr;
+	int GO_VertCount = 0;
+	int GO_IndexCount = 0;
+#endif
 };

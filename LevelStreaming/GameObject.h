@@ -75,7 +75,7 @@ public:
 		return temp;
 	}
 
-	void SetWorldMatrix(XMMATRIX newWorld) {
+	virtual void SetWorldMatrix(XMMATRIX newWorld) {
 		DirectX::XMVECTOR position_v;
 		DirectX::XMVECTOR rotation_v;
 		DirectX::XMVECTOR scale_v;
@@ -104,16 +104,5 @@ protected:
 	XMFLOAT3 scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	bool isActive = true; //If false, won't render or update
 	bool isInvisible = false; //If true, will update but not render
-
-#ifdef _DEBUG
-	ID3D11Buffer* GO_ConstantBuffer = nullptr;
-	ID3D11Buffer* GO_VertexBuffer = nullptr;
-	ID3D11Buffer* GO_IndexBuffer = nullptr;
-	ID3D11VertexShader* GO_VertexShader = nullptr;
-	ID3D11PixelShader* GO_PixelShader = nullptr;
-	ID3D11InputLayout* GO_VertLayout = nullptr;
-	int GO_VertCount = 0;
-	int GO_IndexCount = 0;
-#endif
 };
 

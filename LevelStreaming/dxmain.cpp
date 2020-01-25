@@ -295,7 +295,7 @@ bool dxmain::InitDirectX()
 	dxshared::mView = DirectX::XMMatrixLookAtLH(Eye, At, Up);
 
 	//Initialize the projection matrix 
-	dxshared::mProjection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, dxshared::m_renderWidth / (FLOAT)dxshared::m_renderHeight, 0.01f, 100.0f);
+	dxshared::mProjection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, dxshared::m_renderWidth / (FLOAT)dxshared::m_renderHeight, 0.01f, 2000.0f);
 	
 	return true;
 }

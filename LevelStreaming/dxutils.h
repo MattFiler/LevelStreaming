@@ -49,7 +49,7 @@ struct SimpleVertex
 struct SimpleVertexAlt
 {
 	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
+	XMFLOAT2 Tex;
 };
 
 struct ConstantBuffer

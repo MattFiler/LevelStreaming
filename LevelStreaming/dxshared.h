@@ -24,7 +24,7 @@ public:
 
 	static DirectX::XMFLOAT4 ambientLightColour;
 
-	static bool enableDebug;
+	static bool drawBoundingBoxes;
 
 	static ImGuizmo::OPERATION mCurrentGizmoOperation;
 	static ImGuizmo::MODE mCurrentGizmoMode;

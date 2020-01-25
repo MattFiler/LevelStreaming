@@ -24,11 +24,6 @@ void Camera::Update(float dt)
 	camTarget = DirectX::XMLoadFloat3(&position) + XMVector3Normalize(XMVector3TransformCoord(DefaultForward, XMMatrixRotationRollPitchYaw(rotation.x, rotation.z, rotation.y)));
 	dxshared::mView = XMMatrixLookAtLH(DirectX::XMLoadFloat3(&position), camTarget, camUp);
 
-	if (dxshared::enableDebug && InputHandler::KeyPressed(WindowsKey::O)) {
-		Debug::Log("Camera position = X:" + std::to_string(GameObject::GetPosition().x) + ", Y:" + std::to_string(GameObject::GetPosition().y) + ", Z:" + std::to_string(GameObject::GetPosition().z));
-		Debug::Log("Camera rotation = X:" + std::to_string(GameObject::GetRotation().x) + ", Y:" + std::to_string(GameObject::GetRotation().y) + ", Z:" + std::to_string(GameObject::GetRotation().z));
-	}
-
 	if (isLocked) return;
 	double moveSpeed = dt;
 	if (InputHandler::KeyPressed(WindowsKey::SHIFT)) {

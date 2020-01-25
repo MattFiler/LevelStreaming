@@ -99,9 +99,6 @@ bool EditorScene::Update(double dt)
 	float* projMatrix = &dxutils.MatrixToFloat4x4(dxshared::mProjection).m[0][0];
 	float* viewMatrix = &dxutils.MatrixToFloat4x4(dxshared::mView).m[0][0];
 
-	//Draw a representation of a zone if required
-	if (editType == 0) ImGuizmo::DrawCube(viewMatrix, projMatrix, objectMatrix);
-
 	//Show options to swap between different transforms
 	if (ImGui::RadioButton("Translate", dxshared::mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
 		dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
