@@ -69,6 +69,8 @@ bool EditorScene::Update(double dt)
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Remove Selected Zone")) {
+		allActiveZoneDummys.at(selectedEditZone)->Release();
+		delete allActiveZoneDummys.at(selectedEditZone);
 		allActiveZoneDummys.erase(allActiveZoneDummys.begin() + selectedEditZone);
 	}
 	if (ImGui::CollapsingHeader("Zones In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -140,8 +142,10 @@ bool EditorScene::Update(double dt)
 			commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
 			commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
 
-			std::ofstream commands_json_file(level_path + "COMMANDS.JSON");
-			commands_json_file << commands_json_out;
+			std::vector<uint8_t> bson = json::to_bson(commands_json_out);
+			std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
+			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
+			commands_json_file.close();
 
 			Debug::Log("Saved level!"); //TODO: show a proper IMGUI popup here
 		}
