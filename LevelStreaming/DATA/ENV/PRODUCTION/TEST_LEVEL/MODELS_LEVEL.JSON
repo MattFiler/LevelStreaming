@@ -11,6 +11,14 @@
 		{
 			"NAME": "PADDED_WALL",
 			"PATH": "RENDERABLE/padded_wall.obj"
+		},
+		{
+			"NAME": "FLOOR",
+			"PATH": "RENDERABLE/floor.obj"
+		},
+		{
+			"NAME": "CEILING",
+			"PATH": "RENDERABLE/ceiling.obj"
 		}
 	]
 }
