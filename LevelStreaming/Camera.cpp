@@ -48,15 +48,15 @@ void Camera::Update(float dt)
 		GameObject::SetPosition(XMFLOAT3(GameObject::GetPosition().x, GameObject::GetPosition().y - moveSpeed, GameObject::GetPosition().z));
 	}
 	if (InputHandler::KeyPressed(WindowsKey::Q)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z - dt));
+		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z - dt), true);
 	}
 	if (InputHandler::KeyPressed(WindowsKey::E)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z + dt));
+		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x, GameObject::GetRotation().y, GameObject::GetRotation().z + dt), true);
 	}
 	if (InputHandler::KeyPressed(WindowsKey::F)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x - dt, GameObject::GetRotation().y, GameObject::GetRotation().z));
+		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x - dt, GameObject::GetRotation().y, GameObject::GetRotation().z), true);
 	}
 	if (InputHandler::KeyPressed(WindowsKey::V)) {
-		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x + dt, GameObject::GetRotation().y, GameObject::GetRotation().z));
+		GameObject::SetRotation(XMFLOAT3(GameObject::GetRotation().x + dt, GameObject::GetRotation().y, GameObject::GetRotation().z), true);
 	}
 }

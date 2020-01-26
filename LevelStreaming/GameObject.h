@@ -17,13 +17,15 @@ public:
 	virtual void Update(float dt);
 	virtual void Render(float dt);
 
-	virtual void SetRotation(XMFLOAT3 _rot)
+	virtual void SetRotation(XMFLOAT3 _rot, bool _isRadians = false)
 	{
+		if (!_isRadians) _rot = DirectX::XMFLOAT3(DirectX::XMConvertToRadians(_rot.x), DirectX::XMConvertToRadians(_rot.y), DirectX::XMConvertToRadians(_rot.z));
 		rotation = _rot;
 	}
-	virtual XMFLOAT3 GetRotation()
+	virtual XMFLOAT3 GetRotation(bool asRadians = true)
 	{
-		return rotation;
+		if (asRadians) return rotation;
+		return DirectX::XMFLOAT3(DirectX::XMConvertToDegrees(rotation.x), DirectX::XMConvertToDegrees(rotation.y), DirectX::XMConvertToDegrees(rotation.z));
 	}
 
 	virtual void SetPosition(XMFLOAT3 _pos)
@@ -73,27 +75,6 @@ public:
 		XMFLOAT4X4 temp;
 		DirectX::XMStoreFloat4x4(&temp, mWorld);
 		return temp;
-	}
-
-	virtual void SetWorldMatrix(XMMATRIX newWorld) {
-		DirectX::XMVECTOR position_v;
-		DirectX::XMVECTOR rotation_v;
-		DirectX::XMVECTOR scale_v;
-		DirectX::XMMatrixDecompose(&scale_v, &rotation_v, &position_v, newWorld);
-
-		DirectX::XMFLOAT3 position_i;
-		DirectX::XMStoreFloat3(&position_i, position_v);
-		DirectX::XMFLOAT3 rotation_i;
-		DirectX::XMStoreFloat3(&rotation_i, rotation_v);
-		DirectX::XMFLOAT3 scale_i;
-		DirectX::XMStoreFloat3(&scale_i, scale_v);
-
-		SetPosition(position_i);
-		SetRotation(rotation_i);
-		SetScale(scale_i);
-	}
-	void SetWorldMatrix4X4(XMFLOAT4X4 newWorld) {
-		SetWorldMatrix(DirectX::XMLoadFloat4x4(&newWorld));
 	}
 
 protected:

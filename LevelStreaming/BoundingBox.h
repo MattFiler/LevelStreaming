@@ -14,11 +14,7 @@ public:
 	void Render(float dt) override;
 
 	//Bounding boxes don't currently support rotation
-	void SetRotation(XMFLOAT3 _rot) override {
-		rotation = DirectX::XMFLOAT3(0, 0, 0);
-	}
-	void SetWorldMatrix(XMMATRIX newWorld) override {
-		GameObject::SetWorldMatrix(newWorld);
+	void SetRotation(XMFLOAT3 _rot, bool _isRadians = false) override {
 		rotation = DirectX::XMFLOAT3(0, 0, 0);
 	}
 

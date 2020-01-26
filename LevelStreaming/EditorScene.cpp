@@ -140,9 +140,9 @@ bool EditorScene::Update(double dt)
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(y)->GetPosition().x;
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(y)->GetPosition().y;
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(y)->GetPosition().z;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(y)->GetRotation().x;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(y)->GetRotation().y;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(y)->GetRotation().z;
+					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(y)->GetRotation(false).x;
+					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(y)->GetRotation(false).y;
+					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(y)->GetRotation(false).z;
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(y)->GetScale().x;
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(y)->GetScale().y;
 					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(y)->GetScale().z;
@@ -242,8 +242,7 @@ bool EditorScene::Update(double dt)
 		allActiveZoneDummys.at(i)->ShowVisual(i == selectedEditZone && editType == 0);
 	}
 
-	//Get matrices as float arrays
-	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
+	//Get camera matrices as float arrays
 	float* projMatrix = &dxutils.MatrixToFloat4x4(dxshared::mProjection).m[0][0];
 	float* viewMatrix = &dxutils.MatrixToFloat4x4(dxshared::mView).m[0][0];
 
@@ -273,6 +272,7 @@ bool EditorScene::Update(double dt)
 	}
 
 	//Show current translations in UI
+	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
 	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
 	ImGuizmo::DecomposeMatrixToComponents(objectMatrix, matrixTranslation, matrixRotation, matrixScale);
 	ImGui::InputFloat3("Translation", matrixTranslation, 3);
@@ -287,7 +287,10 @@ bool EditorScene::Update(double dt)
 	ImGui::End();
 
 	//Set new transforms back
-	objectToEdit->SetWorldMatrix4X4(DirectX::XMFLOAT4X4(objectMatrix));
+	ImGuizmo::DecomposeMatrixToComponents(objectMatrix, matrixTranslation, matrixRotation, matrixScale);
+	objectToEdit->SetPosition(DirectX::XMFLOAT3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
+	objectToEdit->SetRotation(DirectX::XMFLOAT3(matrixRotation[0], matrixRotation[1], matrixRotation[2]));
+	objectToEdit->SetScale(DirectX::XMFLOAT3(matrixScale[0], matrixScale[1], matrixScale[2]));
 #endif
 
 	return true;

@@ -17,11 +17,12 @@ public:
 		return vertexCount;
 	}
 
-	void SetRotation(XMFLOAT3 _rot) override
+	void SetRotation(XMFLOAT3 _rot, bool _isRadians = false) override
 	{
+		if (!_isRadians) _rot = DirectX::XMFLOAT3(DirectX::XMConvertToRadians(_rot.x), DirectX::XMConvertToRadians(_rot.y), DirectX::XMConvertToRadians(_rot.z));
 		rotation = _rot;
 		for (int i = 0; i < allModels.size(); i++) {
-			allModels[i].SetRotation(rotation);
+			allModels[i].SetRotation(rotation, true);
 		}
 	}
 
