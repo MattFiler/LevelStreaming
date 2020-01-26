@@ -1,8 +1,0 @@
-{
-	"MODELS": [
-		{
-			"NAME": "TEST_WORLD_TILE",
-			"PATH": "RENDERABLE/test_world_tile.obj"
-		}
-	]
-}

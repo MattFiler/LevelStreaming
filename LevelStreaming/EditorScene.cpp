@@ -1,4 +1,5 @@
 #include "EditorScene.h"
+#include <iomanip>
 
 /* Load config files for level */
 EditorScene::EditorScene(std::string levelName, std::string levelPath, LevelType levelType) : LevelScene(levelName, levelPath, levelType)
@@ -176,6 +177,10 @@ bool EditorScene::Update(double dt)
 			std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
 			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
 			commands_json_file.close();
+
+			std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
+			commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
+			commands_json_file2.close();
 
 			showPopup = true;
 			popupString = "Saved level!";

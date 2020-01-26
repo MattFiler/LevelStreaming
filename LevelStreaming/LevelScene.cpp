@@ -12,9 +12,14 @@ LevelScene::LevelScene(std::string levelName, std::string levelPath, LevelType l
 void LevelScene::Init()
 {
 	//Parse commands JSON
+#if _DEBUG
+	std::fstream cmd_js(level_path + "COMMANDS.JSON");
+	cmd_js >> commands_json;
+#else
 	std::ifstream cmd_js(level_path + "COMMANDS.BIN", std::ios::in | std::ios::binary);
 	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(cmd_js)), std::istreambuf_iterator<char>());
 	commands_json = json::from_bson(contents);
+#endif
 
 	//Parse models JSON
 	std::fstream mdl_js(level_path + "MODELS_LEVEL.JSON");
