@@ -243,7 +243,8 @@ bool EditorScene::Update(double dt)
 		allActiveZoneDummys.at(i)->ShowVisual(i == selectedEditZone && editType == 0);
 	}
 
-	//Get camera matrices as float arrays
+	//Get matrices as float arrays
+	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
 	float* projMatrix = &dxutils.MatrixToFloat4x4(dxshared::mProjection).m[0][0];
 	float* viewMatrix = &dxutils.MatrixToFloat4x4(dxshared::mView).m[0][0];
 
@@ -272,26 +273,30 @@ bool EditorScene::Update(double dt)
 			dxshared::mCurrentGizmoMode = ImGuizmo::WORLD;
 	}
 
-	//Show current translations in UI
-	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
-	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-	ImGuizmo::DecomposeMatrixToComponents(objectMatrix, matrixTranslation, matrixRotation, matrixScale);
-	ImGui::InputFloat3("Translation", matrixTranslation, 3);
-	if (editType == 1) ImGui::InputFloat3("Rotation", matrixRotation, 3);
-	ImGui::InputFloat3("Scale", matrixScale, 3);
-	ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, objectMatrix);
-
 	//Draw manipulation control
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-	ImGuizmo::Manipulate(viewMatrix, projMatrix, dxshared::mCurrentGizmoOperation, dxshared::mCurrentGizmoMode, objectMatrix, NULL, NULL);
-	ImGui::End();
+	ImGuizmo::Manipulate(viewMatrix, projMatrix, dxshared::mCurrentGizmoOperation, dxshared::mCurrentGizmoMode, objectMatrix, NULL, NULL); 
+
+	//Get values from manipulation
+	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+	ImGuizmo::DecomposeMatrixToComponents(objectMatrix, matrixTranslation, matrixRotation, matrixScale);
+
+	//We don't allow gizmo editing of rotation, as ImGuizmo's accuracy really sucks, and throws everything off
+	matrixRotation[0] = objectToEdit->GetRotation(false).x;
+	matrixRotation[1] = objectToEdit->GetRotation(false).y;
+	matrixRotation[2] = objectToEdit->GetRotation(false).z;
+
+	//Allow text overwrite
+	ImGui::InputFloat3("Translation", matrixTranslation, 3);
+	if (editType == 1) ImGui::InputFloat3("Rotation", matrixRotation, 3);
+	ImGui::InputFloat3("Scale", matrixScale, 3);
 
 	//Set new transforms back
-	ImGuizmo::DecomposeMatrixToComponents(objectMatrix, matrixTranslation, matrixRotation, matrixScale);
 	objectToEdit->SetPosition(DirectX::XMFLOAT3(matrixTranslation[0], matrixTranslation[1], matrixTranslation[2]));
 	objectToEdit->SetRotation(DirectX::XMFLOAT3(matrixRotation[0], matrixRotation[1], matrixRotation[2]));
 	objectToEdit->SetScale(DirectX::XMFLOAT3(matrixScale[0], matrixScale[1], matrixScale[2]));
+	ImGui::End();
 #endif
 
 	return true;
