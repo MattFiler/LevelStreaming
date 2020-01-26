@@ -14,6 +14,14 @@ void EditorScene::Init()
 	LevelScene::Init();
 
 #if _DEBUG
+	selectedEditZone = 0;
+	selectedEditModel = 0;
+	editType = 0;
+	selectedNewModelIndex = 0;
+	showModelSelector = false;
+	showPopup = false;
+	dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+
 	//Force-load all zones at all times in editor
 	allActiveModels.clear();
 	allActiveModelNames.clear();
@@ -56,20 +64,30 @@ bool EditorScene::Update(double dt)
 		}
 	}
 
-	//Editor UI
-	ImGui::Begin(LevelScene::GetName().c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+	ImGui::SetNextWindowPos(ImVec2(950, 200));
+	ImGui::SetNextWindowSize(ImVec2(330, 390));
+	ImGui::Begin("Level Editor", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
+	ImGui::Text("Level Editor");
+	ImGui::Separator();
+
+	//Zone edit controls
 	ImGui::RadioButton("Edit Zone Transforms", &editType, 0);
-	ImGui::RadioButton("Edit Model Transforms", &editType, 1);
 	ImGui::Separator();
 	if (ImGui::Button("Add New Zone")) {
 		BoundingBox* zoneDummy = new BoundingBox();
 		zoneDummy->Create();
 		GameObjectManager::AddObject(zoneDummy);
 		allActiveZoneDummys.push_back(zoneDummy);
+
+		editType = 0;
+		selectedEditZone = allActiveZoneDummys.size() - 1;
+
+		showPopup = true;
+		popupString = "Added new zone!";
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Remove Selected Zone")) {
-		allActiveZoneDummys.at(selectedEditZone)->Release();
+		GameObjectManager::RemoveObject(allActiveZoneDummys.at(selectedEditZone));
 		delete allActiveZoneDummys.at(selectedEditZone);
 		allActiveZoneDummys.erase(allActiveZoneDummys.begin() + selectedEditZone);
 	}
@@ -79,19 +97,29 @@ bool EditorScene::Update(double dt)
 		}
 	}
 	ImGui::Separator();
+
+	//Model edit controls
+	ImGui::RadioButton("Edit Model Transforms", &editType, 1);
+	ImGui::Separator();
 	if (ImGui::Button("Add New Model")) {
-		
+		selectedNewModelIndex = 0;
+		showModelSelector = true;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Remove Selected Model")) {
+		GameObjectManager::RemoveObject(allActiveModels.at(selectedEditModel));
+		delete allActiveModels.at(selectedEditModel);
 		allActiveModels.erase(allActiveModels.begin() + selectedEditModel);
+		allActiveModelNames.erase(allActiveModelNames.begin() + selectedEditModel);
 	}
 	if (ImGui::CollapsingHeader("Models In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
 		for (int x = 0; x < allActiveModels.size(); x++) {
-			ImGui::RadioButton(std::to_string(x).c_str(), &selectedEditModel, x);
+			ImGui::RadioButton(("[" + std::to_string(x) + "] - " + allActiveModelNames.at(x)).c_str(), &selectedEditModel, x);
 		}
 	}
 	ImGui::Separator();
+
+	//Save level
 	if (ImGui::Button("Save Level")) {
 		commands_json_out.clear();
 		std::vector<int> saved_models = std::vector<int>();
@@ -133,7 +161,9 @@ bool EditorScene::Update(double dt)
 		}
 
 		if (saved_models.size() != allActiveModels.size()) {
-			Debug::Log("Failed to save " + std::to_string(allActiveModels.size() - saved_models.size()) + " models! Check zone placement."); //TODO: show a proper IMGUI popup here
+			showPopup = true;
+			popupString = "Failed to save " + std::to_string(allActiveModels.size() - saved_models.size()) + " models! Check zone placement.";
+			Debug::Log(popupString);
 		} else {
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
@@ -147,10 +177,46 @@ bool EditorScene::Update(double dt)
 			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
 			commands_json_file.close();
 
-			Debug::Log("Saved level!"); //TODO: show a proper IMGUI popup here
+			showPopup = true;
+			popupString = "Saved level!";
+			Debug::Log(popupString);
 		}
 	}
 	ImGui::End();
+
+	//Show a popup
+	if (showPopup) {
+		ImGui::Begin("Popup", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+		ImGui::Text(popupString.c_str());
+		if (ImGui::Button("OK")) {
+			showPopup = false;
+		}
+		ImGui::End();
+	}
+
+	//Allow a new model to be added to the scene from our model pool
+	if (showModelSelector) {
+		ImGui::Begin("Available Models", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+		for (int i = 0; i < level_models.size(); i++) {
+			ImGui::RadioButton((level_models.at(i).modelName).c_str(), &selectedNewModelIndex, i);
+		}
+		if (ImGui::Button("Add Selected Model")) {
+			Model* new_model = new Model();
+			new_model->SetData(dxutils.LoadModel(level_path + level_models.at(selectedNewModelIndex).modelPath));
+			new_model->Create();
+			GameObjectManager::AddObject(new_model);
+			allActiveModelNames.push_back(level_models.at(selectedNewModelIndex).modelName);
+			allActiveModels.push_back(new_model);
+
+			editType = 1;
+			selectedEditModel = allActiveModels.size() - 1;
+
+			showModelSelector = false;
+			showPopup = true;
+			popupString = "Added new model: " + level_models.at(selectedNewModelIndex).modelName;
+		}
+		ImGui::End();
+	}
 
 	//Only continue if our requested edit object is valid
 	GameObject* objectToEdit = nullptr;
@@ -161,8 +227,14 @@ bool EditorScene::Update(double dt)
 	}
 	else
 	{
+		if (dxshared::mCurrentGizmoOperation == ImGuizmo::ROTATE) dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 		if (allActiveZoneDummys.size() <= selectedEditZone) return true;
 		objectToEdit = allActiveZoneDummys.at(selectedEditZone);
+	}
+
+	//Show active edit zone
+	for (int i = 0; i < allActiveZoneDummys.size(); i++) {
+		allActiveZoneDummys.at(i)->ShowVisual(i == selectedEditZone && editType == 0);
 	}
 
 	//Get matrices as float arrays
@@ -171,6 +243,9 @@ bool EditorScene::Update(double dt)
 	float* viewMatrix = &dxutils.MatrixToFloat4x4(dxshared::mView).m[0][0];
 
 	//Show options to swap between different transforms
+	ImGui::SetNextWindowPos(ImVec2(950, 590));
+	ImGui::SetNextWindowSize(ImVec2(330, 130));
+	ImGui::Begin("Transform Controls", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
 	if (ImGui::RadioButton("Translate", dxshared::mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
 		dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 	ImGui::SameLine();
@@ -204,6 +279,7 @@ bool EditorScene::Update(double dt)
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	ImGuizmo::Manipulate(viewMatrix, projMatrix, dxshared::mCurrentGizmoOperation, dxshared::mCurrentGizmoMode, objectMatrix, NULL, NULL);
+	ImGui::End();
 
 	//Set new transforms back
 	objectToEdit->SetWorldMatrix4X4(DirectX::XMFLOAT4X4(objectMatrix));

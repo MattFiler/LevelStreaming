@@ -22,6 +22,12 @@ public:
 		rotation = DirectX::XMFLOAT3(0, 0, 0);
 	}
 
+	void ShowVisual(bool shouldShow) {
+#ifdef _DEBUG
+		showBounds = shouldShow;
+#endif
+	}
+
 	void SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr);
 	BoundsPair GetDims() {
 		BoundsPair dims = BoundsPair();
@@ -36,6 +42,7 @@ private:
 	DirectX::XMFLOAT3 localTopRight = DirectX::XMFLOAT3(0, 0, 0);
 
 #ifdef _DEBUG
+	bool showBounds = false;
 	ID3D11Buffer* GO_ConstantBuffer = nullptr;
 	ID3D11Buffer* GO_VertexBuffer = nullptr;
 	ID3D11Buffer* GO_IndexBuffer = nullptr;

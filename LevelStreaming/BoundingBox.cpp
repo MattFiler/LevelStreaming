@@ -155,7 +155,7 @@ void BoundingBox::Render(float dt)
 	GameObject::Render(dt);
 
 #ifdef _DEBUG
-	if (dxshared::drawBoundingBoxes) {
+	if (dxshared::drawBoundingBoxes || showBounds) {
 		//Input layout
 		dxshared::m_pImmediateContext->IASetInputLayout(GO_VertLayout);
 
