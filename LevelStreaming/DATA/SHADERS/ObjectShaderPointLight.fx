@@ -1,6 +1,3 @@
-//NEW NON POINT LIGHT OBJECT SHADER
-//STILL TAKES IN POINT LIGHT B/C REASONS
-
 Texture2D txDiffuse : register( t0 );
 SamplerState samLinear : register( s0 );
 
@@ -39,7 +36,7 @@ PS_INPUT VS( VS_INPUT input )
     output.Pos = mul( output.Pos, View );
     output.Pos = mul( output.Pos, Projection );
     output.Tex = input.Tex;
-    output.Norm = input.Norm.xyz;
+    output.Norm = mul( float4( input.Norm, 1 ), World ).xyz;
     
     return output;
 }
@@ -47,6 +44,10 @@ PS_INPUT VS( VS_INPUT input )
 //Base Pixel Shader
 float4 PS( PS_INPUT input) : SV_Target
 {
+    float3 lightDir = normalize(pointlightPosition.xyz - input.WorldPos);
+    float diffuseLighting = saturate(dot(input.Norm, -lightDir));
+    diffuseLighting *= ((length(lightDir) * length(lightDir)) / dot(pointlightPosition.xyz - input.WorldPos, pointlightPosition.xyz - input.WorldPos));
 	float4 colouredTex = (txDiffuse.Sample( samLinear, input.Tex ) * colourTint);
-    return saturate((ambientLight * colouredTex) + saturate((input.Norm.x + input.Norm.y + input.Norm.z)/3));
+
+    return saturate((ambientLight * colouredTex) + ((pointlightColour * diffuseLighting * pointlightPosition.w) * colouredTex));
 }

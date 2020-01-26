@@ -3,6 +3,10 @@
 		{
 			"NAME": "TEST_CORRIDOR_HALF",
 			"PATH": "RENDERABLE/corridor_bit.obj"
+		},
+		{
+			"NAME": "DOOR",
+			"PATH": "RENDERABLE/door.obj"
 		}
 	]
 }

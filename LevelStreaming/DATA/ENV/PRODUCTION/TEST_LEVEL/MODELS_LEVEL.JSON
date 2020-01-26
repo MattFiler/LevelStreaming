@@ -1,3 +1,16 @@
 {
-	"MODELS": []
+	"MODELS": [
+		{
+			"NAME": "DOOR_FRAME",
+			"PATH": "RENDERABLE/door_frame.obj"
+		},
+		{
+			"NAME": "DOOR",
+			"PATH": "RENDERABLE/door.obj"
+		},
+		{
+			"NAME": "PADDED_WALL",
+			"PATH": "RENDERABLE/padded_wall.obj"
+		}
+	]
 }

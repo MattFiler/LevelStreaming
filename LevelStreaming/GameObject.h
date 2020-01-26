@@ -39,7 +39,7 @@ public:
 	
 	virtual void SetScale(float _scale)
 	{
-		scale = XMFLOAT3(_scale, _scale, _scale);
+		SetScale(XMFLOAT3(_scale, _scale, _scale));
 	}
 	virtual void SetScale(XMFLOAT3 _scale)
 	{

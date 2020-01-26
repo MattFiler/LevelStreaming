@@ -13,9 +13,13 @@ public:
 	void Update(float dt) override;
 	void Render(float dt) override;
 
-	//Bounding boxes don't currently support rotation
 	void SetRotation(XMFLOAT3 _rot, bool _isRadians = false) override {
-		rotation = DirectX::XMFLOAT3(0, 0, 0);
+		rotation = DirectX::XMFLOAT3(0, 0, 0); //Bounding boxes don't currently support rotation
+	}
+	void SetScale(DirectX::XMFLOAT3 _scale) {
+		GameObject::SetScale(_scale);
+		localBottomLeft = DirectX::XMFLOAT3(-_scale.x, -_scale.y, -_scale.z);
+		localTopRight = DirectX::XMFLOAT3(_scale.x, _scale.y, _scale.z);
 	}
 
 	void ShowVisual(bool shouldShow) {

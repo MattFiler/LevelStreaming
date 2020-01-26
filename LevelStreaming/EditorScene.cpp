@@ -55,7 +55,7 @@ bool EditorScene::Update(double dt)
 
 #if _DEBUG
 	//Grab references to all loaded models once loading is complete
-	if (zone_load_queue.size() == 0 && allActiveModels.size() == 0) {
+	if (!hasDoneEditorPreload && zone_load_queue.size() == 0 && allActiveModels.size() == 0) {
 		for (int i = 0; i < level_zones.size(); i++) {
 			allActiveZoneDummys.push_back(level_zones.at(i)->zoneBounds);
 			for (int x = 0; x < level_zones.at(i)->loadedModels.size(); x++) {
@@ -63,6 +63,7 @@ bool EditorScene::Update(double dt)
 				allActiveModels.push_back(level_zones.at(i)->loadedModels.at(x));
 			}
 		}
+		hasDoneEditorPreload = true;
 	}
 
 	ImGui::SetNextWindowPos(ImVec2(950, 200));

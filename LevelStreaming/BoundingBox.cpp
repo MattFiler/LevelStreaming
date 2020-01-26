@@ -198,9 +198,6 @@ void BoundingBox::SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr)
 	float z_out = ((_tr.z - _bl.z) / 2);
 	position = DirectX::XMFLOAT3(_bl.x + x_out, _bl.y + y_out, _bl.z + z_out); //Set GameObject position to midpoint of both points
 
-	localBottomLeft = DirectX::XMFLOAT3(-x_out, -y_out, -z_out);
-	localTopRight = DirectX::XMFLOAT3(x_out, y_out, z_out);
-
 	SetScale(DirectX::XMFLOAT3(x_out, y_out, z_out));
 }
 
