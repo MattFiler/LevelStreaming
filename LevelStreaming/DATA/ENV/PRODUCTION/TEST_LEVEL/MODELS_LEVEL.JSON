@@ -17,8 +17,24 @@
 			"PATH": "RENDERABLE/floor.obj"
 		},
 		{
+			"NAME": "FLOOR_CORNER",
+			"PATH": "RENDERABLE/floor_corner.obj"
+		},
+		{
 			"NAME": "CEILING",
 			"PATH": "RENDERABLE/ceiling.obj"
+		},
+		{
+			"NAME": "CEILING_CORNER",
+			"PATH": "RENDERABLE/ceiling_corner.obj"
+		},
+		{
+			"NAME": "PADDED_WALL_CORNER_EXT",
+			"PATH": "RENDERABLE/padded_wall_corner_ext.obj"
+		},
+		{
+			"NAME": "PADDED_WALL_CORNER_INT",
+			"PATH": "RENDERABLE/padded_wall_corner_int.obj"
 		}
 	]
 }
