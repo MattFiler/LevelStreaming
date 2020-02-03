@@ -25,6 +25,7 @@ private:
 	bool showPopup = false;
 	std::string popupString = "";
 
+	int subdivisionCount = 10;
 	bool hasDoneEditorPreload = false;
 
 	std::vector<Model*> allActiveModels = std::vector<Model*>(); //references to models not split into zones (done at compile time in editor)

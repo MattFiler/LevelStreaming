@@ -122,7 +122,45 @@ bool EditorScene::Update(double dt)
 	ImGui::Separator();
 
 	//Save level
+	ImGui::InputInt("Grid Subdivision", &subdivisionCount, 1, 10);
 	if (ImGui::Button("Save Level")) {
+		//Work out total grid bounds
+		DirectX::XMFLOAT3 bottomLeftBound = DirectX::XMFLOAT3(0, 0, 0);
+		DirectX::XMFLOAT3 topRightBound = DirectX::XMFLOAT3(0, 0, 0);
+		for (int i = 0; i < allActiveModels.size(); i++) {
+			DirectX::XMFLOAT3 thisPos = allActiveModels.at(i)->GetPosition();
+			if (thisPos.x < bottomLeftBound.x) bottomLeftBound.x = thisPos.x;
+			if (thisPos.y < bottomLeftBound.y) bottomLeftBound.y = thisPos.y;
+			if (thisPos.z < bottomLeftBound.z) bottomLeftBound.z = thisPos.z;
+			if (thisPos.x > topRightBound.x) topRightBound.x = thisPos.x;
+			if (thisPos.y > topRightBound.y) topRightBound.y = thisPos.y;
+			if (thisPos.z > topRightBound.z) topRightBound.z = thisPos.z;
+		}
+		int widthBoundX = topRightBound.x - bottomLeftBound.x;
+		int widthBoundZ = topRightBound.z - bottomLeftBound.z;
+
+		//Clear out any existing tile defs
+		for (int i = 0; i < allActiveZoneDummys.size(); i++) {
+			GameObjectManager::RemoveObject(allActiveZoneDummys.at(i));
+		}
+		allActiveZoneDummys.clear();
+
+		//Work out how many tiles we should have & make them
+		int gridTileWidth = widthBoundX / subdivisionCount; //talking 2d width/height here - not 3d!
+		int gridTileHeight = widthBoundZ / subdivisionCount;
+		for (int y = 0; y < subdivisionCount; y++) {
+			for (int x = 0; x < subdivisionCount; x++) {
+				BoundingBox* thisZone = new BoundingBox();
+				thisZone->Create();
+				thisZone->SetDims(
+					DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * x), bottomLeftBound.y-1, bottomLeftBound.z + (gridTileHeight * y)),
+					DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * (x + 1)), topRightBound.y+1, bottomLeftBound.z + (gridTileHeight * (y + 1)))
+				);
+				GameObjectManager::AddObject(thisZone);
+				allActiveZoneDummys.push_back(thisZone);
+			}
+		}
+
 		commands_json_out.clear();
 		std::vector<int> saved_models = std::vector<int>();
 

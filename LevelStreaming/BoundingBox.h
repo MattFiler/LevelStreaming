@@ -35,7 +35,7 @@ public:
 		dims.localTopRight = localTopRight;
 		return dims;
 	}
-	bool ContainsPoint(DirectX::XMFLOAT3 _p);
+	bool ContainsPoint(DirectX::XMFLOAT3 _p, bool in_3d = false);
 
 private:
 	DirectX::XMFLOAT3 localBottomLeft = DirectX::XMFLOAT3(0, 0, 0);

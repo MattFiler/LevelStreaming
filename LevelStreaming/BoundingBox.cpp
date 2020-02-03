@@ -202,11 +202,12 @@ void BoundingBox::SetDims(DirectX::XMFLOAT3 _bl, DirectX::XMFLOAT3 _tr)
 }
 
 /* Is a point inside the bounding box in world space? */
-bool BoundingBox::ContainsPoint(DirectX::XMFLOAT3 _p)
+bool BoundingBox::ContainsPoint(DirectX::XMFLOAT3 _p, bool in_3d)
 {
 	if (_p.x > (position.x + localBottomLeft.x) && _p.x < (position.x + localTopRight.x)) {
-		if (_p.y > (position.y + localBottomLeft.y) && _p.y < (position.y + localTopRight.y)) {
-			if (_p.z > (position.z + localBottomLeft.z) && _p.z < (position.z + localTopRight.z)) {
+		if (_p.z >(position.z + localBottomLeft.z) && _p.z < (position.z + localTopRight.z)) {
+			if (!in_3d) return true;
+			if (_p.y > (position.y + localBottomLeft.y) && _p.y < (position.y + localTopRight.y)) {
 				return true;
 			}
 		}
