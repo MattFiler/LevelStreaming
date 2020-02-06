@@ -19,6 +19,16 @@ public:
 		return vertexCount;
 	}
 
+	int GetUseageCount() {
+		return useCount;
+	}
+	void AddUseage() {
+		useCount++;
+	}
+	void RemoveUseage() {
+		useCount--;
+	}
+
 private:
 	Utilities dxutils = Utilities();
 
@@ -34,4 +44,5 @@ private:
 
 	std::string objPath = "";
 	int vertexCount = 0;
+	int useCount = 0;
 };

@@ -4,12 +4,15 @@
 void Model::Create()
 {
 	GameObject::Create();
+	if (!modelData) Debug::Log("Creating a model without its data - check scripts!");
+	modelData->AddUseage();
 }
 
 /* Release all model parts */
 void Model::Release()
 {
 	GameObject::Release();
+	modelData->RemoveUseage();
 }
 
 /* Update all model parts */

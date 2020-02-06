@@ -75,6 +75,10 @@ void LevelScene::Init()
 /* Release the objects in the scene */
 void LevelScene::Release()
 {
+	for (int i = 0; i < loadedModels.size(); i++) {
+		delete loadedModels[i];
+	}
+	loadedModels.clear();
 	for (int i = 0; i < level_zones.size(); i++) {
 		delete level_zones.at(i);
 	}
@@ -230,11 +234,13 @@ void LevelScene::LoadZoneThread(int id)
 /* Unload a zone by ID */
 void LevelScene::UnloadZone(int id)
 {
+	//Don't unload if already unloaded
 	if (!IsZoneLoaded(id)) {
 		Debug::Log("Requested unload of zone " + std::to_string(id) + ", but it isn't loaded!");
 		return;
 	}
 
+	//Unload zone data structs
 	Debug::Log("Un-loading zone " + std::to_string(id));
 	for (int i = 0; i < level_zones[id]->loadedModels.size(); i++)
 	{
@@ -242,4 +248,14 @@ void LevelScene::UnloadZone(int id)
 	}
 	level_zones[id]->loadedModels.clear();
 	level_zones[id]->isLoaded = false;
+
+	//Now the bulky bit, check to see if any model buffers aren't in use anymore - delete them if so
+	std::vector<SharedModelBuffers*> loadedModelsUpdated = std::vector<SharedModelBuffers*>();
+	for (int i = 0; i < loadedModels.size(); i++) {
+		if (loadedModels[i]->GetUseageCount() == 0) {
+			delete loadedModels[i];
+			continue;
+		}
+		loadedModelsUpdated.push_back(loadedModels[i]);
+	}
 }
