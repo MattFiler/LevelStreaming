@@ -166,6 +166,22 @@ void LevelScene::Render(double dt)
 	GameObjectManager::Render(dt);
 }
 
+/* Requested load of model: check our existing loaded data, and if not already loaded, load it */
+SharedModelBuffers* LevelScene::LoadModelToLevel(std::string model_path)
+{
+	//Return an already loaded model buffer, if it exists
+	for (int i = 0; i < loadedModels.size(); i++) {
+		if (loadedModels[i]->GetFilePath() == model_path) {
+			return loadedModels[i];
+		}
+	}
+
+	//Model isn't already loaded - load it
+	SharedModelBuffers* newLoadedModel = new SharedModelBuffers(model_path);
+	loadedModels.push_back(newLoadedModel);
+	return newLoadedModel;
+}
+
 /* Is the zone ID loaded? */
 bool LevelScene::IsZoneLoaded(int id)
 {
@@ -195,7 +211,7 @@ void LevelScene::LoadZoneThread(int id)
 			{
 				Debug::Log("Loading model: " + level_zones[id]->models.at(i).modelName);
 				Model* new_model = new Model();
-				new_model->SetData(dxutils.LoadModel(level_path + level_models[x].modelPath));
+				new_model->SetData(LoadModelToLevel(level_path + level_models[x].modelPath));
 				new_model->SetPosition(level_zones[id]->models.at(i).position);
 				new_model->SetRotation(level_zones[id]->models.at(i).rotation);
 				new_model->SetScale(level_zones[id]->models.at(i).scale);

@@ -208,7 +208,7 @@ bool EditorScene::Update(double dt)
 		}
 		if (ImGui::Button("Add Selected Model")) {
 			Model* new_model = new Model();
-			new_model->SetData(dxutils.LoadModel(level_path + level_models.at(selectedNewModelIndex).modelPath));
+			new_model->SetData(LoadModelToLevel(level_path + level_models.at(selectedNewModelIndex).modelPath));
 			new_model->Create();
 			GameObjectManager::AddObject(new_model);
 			allActiveModelNames.push_back(level_models.at(selectedNewModelIndex).modelName);

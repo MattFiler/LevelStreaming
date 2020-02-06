@@ -18,6 +18,8 @@ public:
 	}
 
 protected:
+	SharedModelBuffers* LoadModelToLevel(std::string model_path);
+
 	bool IsZoneLoaded(int id);
 	void LoadZone(int id);
 	void LoadZoneThread(int id);
@@ -39,6 +41,8 @@ protected:
 
 	std::vector<ZoneDef*> level_zones = std::vector<ZoneDef*>();
 	std::vector<ModelDef> level_models = std::vector<ModelDef>();
+
+	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>();
 
 	bool should_update_queue = false;
 	std::vector<int> zone_load_queue = std::vector<int>();

@@ -40,11 +40,12 @@
     <ClCompile Include="imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="InputHandler.cpp" />
-    <ClCompile Include="ModelPart.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="LevelScene.cpp" />
+    <ClCompile Include="SharedModelBuffers.cpp" />
+    <ClCompile Include="SharedModelPart.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -73,11 +74,12 @@
     <ClInclude Include="imgui\imstb_truetype.h" />
     <ClInclude Include="InputHandler.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="ModelPart.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SharedModelBuffers.h" />
+    <ClInclude Include="SharedModelPart.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="LevelScene.h" />
   </ItemGroup>

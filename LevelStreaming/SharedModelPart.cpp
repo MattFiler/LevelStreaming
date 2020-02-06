@@ -1,12 +1,9 @@
-#include "ModelPart.h"
-#include "Light.h"
-#include <fstream>
-#include <vector>
+#include "SharedModelPart.h"
 
-/* Create basic resources */
-void ModelPart::Create()
+/* Create the model part (a child to SharedModelBuffers) */
+SharedModelPart::SharedModelPart(LoadedModelPart _m)
 {
-	GameObject::Create();
+	modelMetaData = _m;
 
 	//Create index buffer 
 	D3D11_BUFFER_DESC bd;
@@ -44,36 +41,20 @@ void ModelPart::Create()
 	loadedMaterial.materialColour.w = modelMetaData.thisMaterial.a;
 }
 
-/* Release the model */
-void ModelPart::Release()
+/* Destroy our model part */
+SharedModelPart::~SharedModelPart()
 {
-	GameObject::Release();
-
 	Memory::SafeRelease(g_pIndexBuffer);
 	Memory::SafeRelease(loadedMaterial.materialTexture);
 	Memory::SafeRelease(g_pConstantBuffer);
 }
 
-/* Update the model */
-void ModelPart::Update(float dt)
+/* Render our model part */
+void SharedModelPart::Render(XMMATRIX world)
 {
-	GameObject::Update(dt);
-
-	if (!isActive) return;
-	if (indexCount == 0) return;
-}
-
-/* Render the model */
-void ModelPart::Render(float dt)
-{
-	//GameObject::Render(dt);
-
-	if (!isActive) return;
-	if (indexCount == 0) return;
-
 	//Update and set constant buffer
 	ConstantBuffer cb;
-	cb.mWorld = XMMatrixTranspose(mWorld);
+	cb.mWorld = XMMatrixTranspose(world);
 	cb.mView = XMMatrixTranspose(dxshared::mView);
 	cb.mProjection = XMMatrixTranspose(dxshared::mProjection);
 	cb.colourTint = loadedMaterial.materialColour;
