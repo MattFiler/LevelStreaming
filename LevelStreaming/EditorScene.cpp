@@ -17,7 +17,9 @@ void EditorScene::Init()
 #if _DEBUG
 	selectedEditZone = 0;
 	selectedEditModel = 0;
-	editType = 0;
+	editType = 1;
+	doAutoZones = true;
+	subdivisionCount = 10;
 	selectedNewModelIndex = 0;
 	showModelSelector = false;
 	showPopup = false;
@@ -73,29 +75,38 @@ bool EditorScene::Update(double dt)
 	ImGui::Separator();
 
 	//Zone edit controls
-	ImGui::RadioButton("Edit Zone Transforms", &editType, 0);
-	ImGui::Separator();
-	if (ImGui::Button("Add New Zone")) {
-		BoundingBox* zoneDummy = new BoundingBox();
-		zoneDummy->Create();
-		GameObjectManager::AddObject(zoneDummy);
-		allActiveZoneDummys.push_back(zoneDummy);
+	ImGui::Checkbox("Autogenerate Zones", &doAutoZones);
+	if (doAutoZones) 
+	{
+		ImGui::InputInt("Subdivision", &subdivisionCount);
+		if (subdivisionCount < 1) subdivisionCount = 1;
+	} 
+	else
+	{
+		ImGui::RadioButton("Edit Zone Transforms", &editType, 0);
+		ImGui::Separator();
+		if (ImGui::Button("Add New Zone")) {
+			BoundingBox* zoneDummy = new BoundingBox();
+			zoneDummy->Create();
+			GameObjectManager::AddObject(zoneDummy);
+			allActiveZoneDummys.push_back(zoneDummy);
 
-		editType = 0;
-		selectedEditZone = allActiveZoneDummys.size() - 1;
+			editType = 0;
+			selectedEditZone = allActiveZoneDummys.size() - 1;
 
-		showPopup = true;
-		popupString = "Added new zone!";
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Remove Selected Zone")) {
-		GameObjectManager::RemoveObject(allActiveZoneDummys.at(selectedEditZone));
-		delete allActiveZoneDummys.at(selectedEditZone);
-		allActiveZoneDummys.erase(allActiveZoneDummys.begin() + selectedEditZone);
-	}
-	if (ImGui::CollapsingHeader("Zones In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
-		for (int x = 0; x < allActiveZoneDummys.size(); x++) {
-			ImGui::RadioButton(("Zone " + std::to_string(x)).c_str(), &selectedEditZone, x);
+			showPopup = true;
+			popupString = "Added new zone!";
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Remove Selected Zone")) {
+			GameObjectManager::RemoveObject(allActiveZoneDummys.at(selectedEditZone));
+			delete allActiveZoneDummys.at(selectedEditZone);
+			allActiveZoneDummys.erase(allActiveZoneDummys.begin() + selectedEditZone);
+		}
+		if (ImGui::CollapsingHeader("Zones In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (int x = 0; x < allActiveZoneDummys.size(); x++) {
+				ImGui::RadioButton(("Zone " + std::to_string(x)).c_str(), &selectedEditZone, x);
+			}
 		}
 	}
 	ImGui::Separator();
@@ -123,6 +134,46 @@ bool EditorScene::Update(double dt)
 
 	//Save level
 	if (ImGui::Button("Save Level")) {
+		if (doAutoZones) {
+			//Work out total grid bounds
+			DirectX::XMFLOAT3 bottomLeftBound = DirectX::XMFLOAT3(0, 0, 0);
+			DirectX::XMFLOAT3 topRightBound = DirectX::XMFLOAT3(0, 0, 0);
+			for (int i = 0; i < allActiveModels.size(); i++) {
+				DirectX::XMFLOAT3 thisPos = allActiveModels.at(i)->GetPosition();
+				if (thisPos.x < bottomLeftBound.x) bottomLeftBound.x = thisPos.x - 1;
+				if (thisPos.y < bottomLeftBound.y) bottomLeftBound.y = thisPos.y - 1;
+				if (thisPos.z < bottomLeftBound.z) bottomLeftBound.z = thisPos.z - 1;
+				if (thisPos.x > topRightBound.x) topRightBound.x = thisPos.x + 1;
+				if (thisPos.y > topRightBound.y) topRightBound.y = thisPos.y + 1;
+				if (thisPos.z > topRightBound.z) topRightBound.z = thisPos.z + 1;
+			}
+			int widthBoundX = topRightBound.x - bottomLeftBound.x;
+			int widthBoundZ = topRightBound.z - bottomLeftBound.z;
+
+			//Clear out any existing tile defs
+			for (int i = 0; i < allActiveZoneDummys.size(); i++) {
+				GameObjectManager::RemoveObject(allActiveZoneDummys.at(i));
+			}
+			allActiveZoneDummys.clear();
+
+			//Work out how many tiles we should have & make them
+			int gridTileWidth = widthBoundX / subdivisionCount; //talking 2d width/height here - not 3d!
+			int gridTileHeight = widthBoundZ / subdivisionCount;
+			for (int y = 0; y < subdivisionCount + 1; y++) {
+				for (int x = 0; x < subdivisionCount + 3; x++) {
+					BoundingBox* thisZone = new BoundingBox();
+					thisZone->Create();
+					thisZone->SetDims(
+						DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * x), bottomLeftBound.y - 1, bottomLeftBound.z + (gridTileHeight * y)),
+						DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * (x + 1)), topRightBound.y + 1, bottomLeftBound.z + (gridTileHeight * (y + 1)))
+					);
+					thisZone->Update(dt);
+					GameObjectManager::AddObject(thisZone);
+					allActiveZoneDummys.push_back(thisZone);
+				}
+			}
+		}
+
 		commands_json_out.clear();
 		std::vector<int> saved_models = std::vector<int>();
 
@@ -166,6 +217,9 @@ bool EditorScene::Update(double dt)
 			showPopup = true;
 			popupString = "Failed to save " + std::to_string(allActiveModels.size() - saved_models.size()) + " models! Check zone placement.";
 			Debug::Log(popupString);
+			for (int i = 0; i < saved_models.size(); i++) {
+				Debug::Log("Saved: " + allActiveModelNames.at(saved_models[i]));
+			}
 		} else {
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;

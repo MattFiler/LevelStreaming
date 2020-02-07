@@ -37,10 +37,11 @@ public:
 	}
 	bool ContainsPoint(DirectX::XMFLOAT3 _p);
 
-private:
+protected:
 	DirectX::XMFLOAT3 localBottomLeft = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT3 localTopRight = DirectX::XMFLOAT3(0, 0, 0);
 
+private:
 #ifdef _DEBUG
 	bool showBounds = false;
 	ID3D11Buffer* GO_ConstantBuffer = nullptr;
