@@ -122,10 +122,10 @@ bool LevelScene::Update(double dt)
 	//Check to see if the camera (player) has entered a zone - call to load if it has
 	if (!in_editor_mode && level_grid) {
 		LevelZoneTile* activeTile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(main_cam.GetPosition().x, main_cam.GetPosition().z));
+		//TODO: do a neighbour loading thing here
 		if (activeTile) {
 			activeTile->LoadTile();
 		}
-
 		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
 			if (level_grid->GetAllTiles()[i] != activeTile) level_grid->GetAllTiles()[i]->UnloadTile();
 		}

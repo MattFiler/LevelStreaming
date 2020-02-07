@@ -14,7 +14,7 @@ LevelZoneTile::~LevelZoneTile()
 /* Load the zone tile */
 void LevelZoneTile::LoadTile()
 {
-	if (IsTileLoaded()) return;
+	if (IsTileLoadedOrLoading()) return;
 	isLoading = true;
 	isPushed = false;
 	std::thread* load_models = new std::thread([this] { LoadTileThread(); });
@@ -23,9 +23,8 @@ void LevelZoneTile::LoadTile()
 /* Unload the zone tile */
 void LevelZoneTile::UnloadTile()
 {
-	if (!IsTileLoaded()) return;
+	if (!IsTileLoadedOrLoading()) return;
 
-	//Unload zone data structs
 	for (int i = 0; i < loadedModels.size(); i++)
 	{
 		GameObjectManager::RemoveObject(loadedModels[i]);
@@ -33,17 +32,6 @@ void LevelZoneTile::UnloadTile()
 	loadedModels.clear();
 	isLoaded = false;
 	isPushed = false;
-
-	//Now the bulky bit, check to see if any model buffers aren't in use anymore - delete them if so
-	std::vector<SharedModelBuffers*> loadedModelsUpdated = std::vector<SharedModelBuffers*>();
-	for (int i = 0; i < mainGrid->loadedModels.size(); i++) {
-		if (mainGrid->loadedModels[i]->GetUseageCount() == 0) {
-			delete mainGrid->loadedModels[i];
-			continue;
-		}
-		loadedModelsUpdated.push_back(mainGrid->loadedModels[i]);
-	}
-	mainGrid->loadedModels = loadedModelsUpdated;
 }
 
 /* Keep track of loading, and push all GOs to the GO manager if loaded */

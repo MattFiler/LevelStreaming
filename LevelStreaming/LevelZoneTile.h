@@ -43,8 +43,14 @@ public:
 	void LoadTile();
 	void UnloadTile();
 
-	/* Is the tile loaded? */
+	/* Is the tile loaded/loading? */
 	bool IsTileLoaded() {
+		return isLoaded;
+	}
+	bool IsTileLoading() {
+		return isLoading;
+	}
+	bool IsTileLoadedOrLoading() {
 		return isLoading || isLoaded;
 	}
 
