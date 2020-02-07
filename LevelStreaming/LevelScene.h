@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Scene.h"
+#include "LevelZoneGrid.h"
+#include "LevelZoneTile.h"
 
 class LevelScene : public Scene
 {
@@ -18,13 +20,6 @@ public:
 	}
 
 protected:
-	SharedModelBuffers* LoadModelToLevel(std::string model_path);
-
-	bool IsZoneLoaded(int id);
-	void LoadZone(int id);
-	void LoadZoneThread(int id);
-	void UnloadZone(int id);
-
 	Utilities dxutils = Utilities();
 
 	std::string level_name;
@@ -39,12 +34,6 @@ protected:
 	Camera main_cam;
 	Light light_source;
 
-	std::vector<ZoneDef*> level_zones = std::vector<ZoneDef*>();
-	std::vector<ModelDef> level_models = std::vector<ModelDef>();
-
-	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>();
-
-	bool should_update_queue = false;
-	std::vector<int> zone_load_queue = std::vector<int>();
+	LevelZoneGrid* level_grid = nullptr;
 };
 

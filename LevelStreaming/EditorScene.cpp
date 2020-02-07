@@ -15,23 +15,19 @@ void EditorScene::Init()
 	LevelScene::Init();
 
 #if _DEBUG
-	selectedEditZone = 0;
 	selectedEditModel = 0;
-	editType = 1;
-	doAutoZones = true;
-	subdivisionCount = 10;
+	subdivisionCount = (level_grid) ? level_grid->subdivisionCount : 10;
 	selectedNewModelIndex = 0;
 	showModelSelector = false;
 	showPopup = false;
 	dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 
-	//Force-load all zones at all times in editor
-	allActiveModels.clear();
-	allActiveModelNames.clear();
-	allActiveZoneDummys.clear();
-	for (int i = 0; i < level_zones.size(); i++) {
-		if (!IsZoneLoaded(i)) {
-			LoadZone(i);
+	if (level_type != LevelType::FE_LEVEL) {
+		//Force-load all zones at all times in editor
+		allActiveModels.clear();
+		allActiveModelNames.clear();
+		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
+			level_grid->GetAllTiles()[i]->LoadTile();
 		}
 	}
 #endif
@@ -41,31 +37,33 @@ void EditorScene::Init()
 void EditorScene::Release()
 {
 	LevelScene::Release();
-
-#if _DEBUG
-	for (int i = 0; i < allActiveZoneDummys.size(); i++) {
-		delete allActiveZoneDummys.at(i);
-	}
-	allActiveZoneDummys.clear();
-#endif
 }
 
 /* Update the objects in the scene */
 bool EditorScene::Update(double dt)
 {
 	LevelScene::Update(dt);
+	if (level_type == LevelType::FE_LEVEL) return true;
 
 #if _DEBUG
 	//Grab references to all loaded models once loading is complete
-	if (!hasDoneEditorPreload && zone_load_queue.size() == 0 && allActiveModels.size() == 0) {
-		for (int i = 0; i < level_zones.size(); i++) {
-			allActiveZoneDummys.push_back(level_zones.at(i)->zoneBounds);
-			for (int x = 0; x < level_zones.at(i)->loadedModels.size(); x++) {
-				allActiveModelNames.push_back(level_zones.at(i)->models.at(x).modelName);
-				allActiveModels.push_back(level_zones.at(i)->loadedModels.at(x));
+	if (!hasDoneEditorPreload) {
+		bool loadCompleted = true;
+		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
+			if (!level_grid->GetAllTiles()[i]->isLoaded) {
+				loadCompleted = false;
+				break;
 			}
 		}
-		hasDoneEditorPreload = true;
+		if (loadCompleted) {
+			for (int i = 0; i < level_grid->levelTiles.size(); i++) {
+				for (int x = 0; x < level_grid->levelTiles[i]->loadedModels.size(); x++) {
+					allActiveModelNames.push_back(level_grid->levelTiles[i]->models.at(x).modelName);
+					allActiveModels.push_back(level_grid->levelTiles[i]->loadedModels.at(x));
+				}
+			}
+			hasDoneEditorPreload = true;
+		}
 	}
 
 	ImGui::SetNextWindowPos(ImVec2(950, 200));
@@ -75,44 +73,13 @@ bool EditorScene::Update(double dt)
 	ImGui::Separator();
 
 	//Zone edit controls
-	ImGui::Checkbox("Autogenerate Zones", &doAutoZones);
-	if (doAutoZones) 
-	{
-		ImGui::InputInt("Subdivision", &subdivisionCount);
-		if (subdivisionCount < 1) subdivisionCount = 1;
-	} 
-	else
-	{
-		ImGui::RadioButton("Edit Zone Transforms", &editType, 0);
-		ImGui::Separator();
-		if (ImGui::Button("Add New Zone")) {
-			BoundingBox* zoneDummy = new BoundingBox();
-			zoneDummy->Create();
-			GameObjectManager::AddObject(zoneDummy);
-			allActiveZoneDummys.push_back(zoneDummy);
-
-			editType = 0;
-			selectedEditZone = allActiveZoneDummys.size() - 1;
-
-			showPopup = true;
-			popupString = "Added new zone!";
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Remove Selected Zone")) {
-			GameObjectManager::RemoveObject(allActiveZoneDummys.at(selectedEditZone));
-			delete allActiveZoneDummys.at(selectedEditZone);
-			allActiveZoneDummys.erase(allActiveZoneDummys.begin() + selectedEditZone);
-		}
-		if (ImGui::CollapsingHeader("Zones In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
-			for (int x = 0; x < allActiveZoneDummys.size(); x++) {
-				ImGui::RadioButton(("Zone " + std::to_string(x)).c_str(), &selectedEditZone, x);
-			}
-		}
-	}
+	ImGui::Text("Zones Generation Properties");
+	ImGui::InputInt("Subdivision", &subdivisionCount);
+	if (subdivisionCount < 1) subdivisionCount = 1;
 	ImGui::Separator();
 
 	//Model edit controls
-	ImGui::RadioButton("Edit Model Transforms", &editType, 1);
+	ImGui::Text("Edit Level Models");
 	ImGui::Separator();
 	if (ImGui::Button("Add New Model")) {
 		selectedNewModelIndex = 0;
@@ -134,113 +101,58 @@ bool EditorScene::Update(double dt)
 
 	//Save level
 	if (ImGui::Button("Save Level")) {
-		if (doAutoZones) {
-			//Work out total grid bounds
-			DirectX::XMFLOAT3 bottomLeftBound = DirectX::XMFLOAT3(0, 0, 0);
-			DirectX::XMFLOAT3 topRightBound = DirectX::XMFLOAT3(0, 0, 0);
-			for (int i = 0; i < allActiveModels.size(); i++) {
-				DirectX::XMFLOAT3 thisPos = allActiveModels.at(i)->GetPosition();
-				if (thisPos.x < bottomLeftBound.x) bottomLeftBound.x = thisPos.x - 1;
-				if (thisPos.y < bottomLeftBound.y) bottomLeftBound.y = thisPos.y - 1;
-				if (thisPos.z < bottomLeftBound.z) bottomLeftBound.z = thisPos.z - 1;
-				if (thisPos.x > topRightBound.x) topRightBound.x = thisPos.x + 1;
-				if (thisPos.y > topRightBound.y) topRightBound.y = thisPos.y + 1;
-				if (thisPos.z > topRightBound.z) topRightBound.z = thisPos.z + 1;
-			}
-			int widthBoundX = topRightBound.x - bottomLeftBound.x;
-			int widthBoundZ = topRightBound.z - bottomLeftBound.z;
-
-			//Clear out any existing tile defs
-			for (int i = 0; i < allActiveZoneDummys.size(); i++) {
-				GameObjectManager::RemoveObject(allActiveZoneDummys.at(i));
-			}
-			allActiveZoneDummys.clear();
-
-			//Work out how many tiles we should have & make them
-			int gridTileWidth = widthBoundX / subdivisionCount; //talking 2d width/height here - not 3d!
-			int gridTileHeight = widthBoundZ / subdivisionCount;
-			for (int y = 0; y < subdivisionCount + 1; y++) {
-				for (int x = 0; x < subdivisionCount + 3; x++) {
-					BoundingBox* thisZone = new BoundingBox();
-					thisZone->Create();
-					thisZone->SetDims(
-						DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * x), bottomLeftBound.y - 1, bottomLeftBound.z + (gridTileHeight * y)),
-						DirectX::XMFLOAT3(bottomLeftBound.x + (gridTileWidth * (x + 1)), topRightBound.y + 1, bottomLeftBound.z + (gridTileHeight * (y + 1)))
-					);
-					thisZone->Update(dt);
-					GameObjectManager::AddObject(thisZone);
-					allActiveZoneDummys.push_back(thisZone);
-				}
-			}
-		}
-
 		commands_json_out.clear();
-		std::vector<int> saved_models = std::vector<int>();
 
-		for (int i = 0; i < allActiveZoneDummys.size(); i++) {
-			commands_json_out["ZONES"][i]["BOUNDS"][0][0] = allActiveZoneDummys.at(i)->GetPosition().x - allActiveZoneDummys.at(i)->GetScale().x;
-			commands_json_out["ZONES"][i]["BOUNDS"][0][1] = allActiveZoneDummys.at(i)->GetPosition().y - allActiveZoneDummys.at(i)->GetScale().y;
-			commands_json_out["ZONES"][i]["BOUNDS"][0][2] = allActiveZoneDummys.at(i)->GetPosition().z - allActiveZoneDummys.at(i)->GetScale().z;
-			commands_json_out["ZONES"][i]["BOUNDS"][1][0] = allActiveZoneDummys.at(i)->GetPosition().x + allActiveZoneDummys.at(i)->GetScale().x;
-			commands_json_out["ZONES"][i]["BOUNDS"][1][1] = allActiveZoneDummys.at(i)->GetPosition().y + allActiveZoneDummys.at(i)->GetScale().y;
-			commands_json_out["ZONES"][i]["BOUNDS"][1][2] = allActiveZoneDummys.at(i)->GetPosition().z + allActiveZoneDummys.at(i)->GetScale().z;
-
-			int count = 0;
-			for (int y = 0; y < allActiveModels.size(); y++) {
-				if (allActiveZoneDummys.at(i)->ContainsPoint(allActiveModels.at(y)->GetPosition())) {
-					commands_json_out["ZONES"][i]["CONTENT"][count]["MODEL"] = allActiveModelNames.at(y);
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(y)->GetPosition().x;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(y)->GetPosition().y;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(y)->GetPosition().z;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(y)->GetRotation(false).x;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(y)->GetRotation(false).y;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(y)->GetRotation(false).z;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(y)->GetScale().x;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(y)->GetScale().y;
-					commands_json_out["ZONES"][i]["CONTENT"][count]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(y)->GetScale().z;
-					count++;
-
-					bool to_add = true;
-					for (int z = 0; z < saved_models.size(); z++) {
-						if (saved_models.at(z) == y) {
-							to_add = false;
-						}
-					}
-					if (to_add) {
-						saved_models.push_back(y);
-					}
-				}
-			}
+		//Work out total grid bounds
+		DirectX::XMFLOAT2 bottomLeft = DirectX::XMFLOAT2(0, 0);
+		DirectX::XMFLOAT2 topRight = DirectX::XMFLOAT2(0, 0);
+		for (int i = 0; i < allActiveModels.size(); i++) {
+			DirectX::XMFLOAT3 thisPos = allActiveModels.at(i)->GetPosition();
+			if (thisPos.x < bottomLeft.x) bottomLeft.x = thisPos.x - 1;
+			if (thisPos.z < bottomLeft.y) bottomLeft.y = thisPos.z - 1;
+			if (thisPos.x > topRight.x) topRight.x = thisPos.x + 1;
+			if (thisPos.z > topRight.y) topRight.y = thisPos.z + 1;
 		}
 
-		if (saved_models.size() != allActiveModels.size()) {
-			showPopup = true;
-			popupString = "Failed to save " + std::to_string(allActiveModels.size() - saved_models.size()) + " models! Check zone placement.";
-			Debug::Log(popupString);
-			for (int i = 0; i < saved_models.size(); i++) {
-				Debug::Log("Saved: " + allActiveModelNames.at(saved_models[i]));
-			}
-		} else {
-			commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
-			commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
-			commands_json_out["PLAYER_SPAWN"]["POSITION"][2] = 0;
-			commands_json_out["PLAYER_SPAWN"]["ROTATION"][0] = 0;
-			commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
-			commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
+		//Write new grid info
+		commands_json_out["BOUNDS"]["BOTTOM_LEFT"][0] = bottomLeft.x;
+		commands_json_out["BOUNDS"]["BOTTOM_LEFT"][1] = bottomLeft.y;
+		commands_json_out["BOUNDS"]["TOP_RIGHT"][0] = topRight.x;
+		commands_json_out["BOUNDS"]["TOP_RIGHT"][1] = topRight.y;
+		commands_json_out["SUBDIVISION"] = subdivisionCount;
 
-			std::vector<uint8_t> bson = json::to_bson(commands_json_out);
-			std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
-			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
-			commands_json_file.close();
-
-			std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
-			commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
-			commands_json_file2.close();
-
-			showPopup = true;
-			popupString = "Saved level!";
-			Debug::Log(popupString);
+		for (int i = 0; i < allActiveModels.size(); i++) {
+			commands_json_out["CONTENT"][i]["MODEL"] = allActiveModelNames.at(i);
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
+			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
 		}
+
+		commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
+		commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
+		commands_json_out["PLAYER_SPAWN"]["POSITION"][2] = 0;
+		commands_json_out["PLAYER_SPAWN"]["ROTATION"][0] = 0;
+		commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
+		commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
+
+		std::vector<uint8_t> bson = json::to_bson(commands_json_out);
+		std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
+		commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
+		commands_json_file.close();
+
+		std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
+		commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
+		commands_json_file2.close();
+
+		showPopup = true;
+		popupString = "Saved level!";
+		Debug::Log(popupString);
 	}
 	ImGui::End();
 
@@ -257,45 +169,29 @@ bool EditorScene::Update(double dt)
 	//Allow a new model to be added to the scene from our model pool
 	if (showModelSelector) {
 		ImGui::Begin("Available Models", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
-		for (int i = 0; i < level_models.size(); i++) {
-			ImGui::RadioButton((level_models.at(i).modelName).c_str(), &selectedNewModelIndex, i);
+		for (int i = 0; i < level_grid->levelModels.size(); i++) {
+			ImGui::RadioButton((level_grid->levelModels.at(i).modelName).c_str(), &selectedNewModelIndex, i);
 		}
 		if (ImGui::Button("Add Selected Model")) {
 			Model* new_model = new Model();
-			new_model->SetData(LoadModelToLevel(level_path + level_models.at(selectedNewModelIndex).modelPath));
+			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath));
 			new_model->Create();
 			GameObjectManager::AddObject(new_model);
-			allActiveModelNames.push_back(level_models.at(selectedNewModelIndex).modelName);
+			allActiveModelNames.push_back(level_grid->levelModels.at(selectedNewModelIndex).modelName);
 			allActiveModels.push_back(new_model);
 
-			editType = 1;
 			selectedEditModel = allActiveModels.size() - 1;
 
 			showModelSelector = false;
 			showPopup = true;
-			popupString = "Added new model: " + level_models.at(selectedNewModelIndex).modelName;
+			popupString = "Added new model: " + level_grid->levelModels.at(selectedNewModelIndex).modelName;
 		}
 		ImGui::End();
 	}
 
 	//Only continue if our requested edit object is valid
-	GameObject* objectToEdit = nullptr;
-	if (editType == 1)
-	{
-		if (allActiveModels.size() <= selectedEditModel) return true;
-		objectToEdit = allActiveModels.at(selectedEditModel);
-	}
-	else
-	{
-		if (dxshared::mCurrentGizmoOperation == ImGuizmo::ROTATE) dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-		if (allActiveZoneDummys.size() <= selectedEditZone) return true;
-		objectToEdit = allActiveZoneDummys.at(selectedEditZone);
-	}
-
-	//Show active edit zone
-	for (int i = 0; i < allActiveZoneDummys.size(); i++) {
-		allActiveZoneDummys.at(i)->ShowVisual(i == selectedEditZone && editType == 0);
-	}
+	if (allActiveModels.size() <= selectedEditModel) return true;
+	GameObject* objectToEdit = allActiveModels.at(selectedEditModel);
 
 	//Get matrices as float arrays
 	float* objectMatrix = &objectToEdit->GetWorldMatrix4X4().m[0][0];
@@ -309,11 +205,9 @@ bool EditorScene::Update(double dt)
 	if (ImGui::RadioButton("Translate", dxshared::mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
 		dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 	ImGui::SameLine();
-	if (editType == 1) {
-		if (ImGui::RadioButton("Rotate", dxshared::mCurrentGizmoOperation == ImGuizmo::ROTATE))
-			dxshared::mCurrentGizmoOperation = ImGuizmo::ROTATE;
-		ImGui::SameLine();
-	}
+	if (ImGui::RadioButton("Rotate", dxshared::mCurrentGizmoOperation == ImGuizmo::ROTATE))
+		dxshared::mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
 	if (ImGui::RadioButton("Scale", dxshared::mCurrentGizmoOperation == ImGuizmo::SCALE))
 		dxshared::mCurrentGizmoOperation = ImGuizmo::SCALE;
 
@@ -343,7 +237,7 @@ bool EditorScene::Update(double dt)
 
 	//Allow text overwrite
 	ImGui::InputFloat3("Translation", matrixTranslation, 3);
-	if (editType == 1) ImGui::InputFloat3("Rotation", matrixRotation, 3);
+	ImGui::InputFloat3("Rotation", matrixRotation, 3);
 	ImGui::InputFloat3("Scale", matrixScale, 3);
 
 	//Set new transforms back

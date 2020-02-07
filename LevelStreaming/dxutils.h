@@ -140,16 +140,6 @@ struct ModelPlacement {
 	DirectX::XMFLOAT3 rotation = DirectX::XMFLOAT3(0, 0, 0);
 	DirectX::XMFLOAT3 scale = DirectX::XMFLOAT3(0, 0, 0);
 };
-class Model;
-class BoundingBox;
-struct ZoneDef {
-	bool isLoading = false;
-	bool isLoaded = false;
-	std::vector<ModelPlacement> models = std::vector<ModelPlacement>();
-	std::vector<Model*> loadedModels = std::vector<Model*>(); //Set per level to track assets to unload
-	std::mutex mutex;
-	BoundingBox* zoneBounds = nullptr;
-};
 
 struct BoundsPair {
 	DirectX::XMFLOAT3 localBottomLeft;
