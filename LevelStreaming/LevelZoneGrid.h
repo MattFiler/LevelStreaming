@@ -24,7 +24,9 @@ public:
 	friend class LevelZoneTile;
 	friend class EditorScene;
 
-	LevelZoneGrid(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd);
+	LevelZoneGrid(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd) {
+		Resize(_bl, _tr, _sd);
+	}
 	~LevelZoneGrid() {
 		for (int i = 0; i < levelTiles.size(); i++) {
 			delete levelTiles[i];
@@ -36,6 +38,8 @@ public:
 		loadedModels.clear();
 		levelModels.clear();
 	}
+
+	void Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd);
 
 	void AddLevelModel(ModelDef _m) {
 		levelModels.push_back(_m);

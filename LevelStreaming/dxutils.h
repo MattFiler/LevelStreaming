@@ -85,6 +85,11 @@ enum VertReaderType
 	NORMAL,
 };
 
+enum LevelOfDetail {
+	HIGH,
+	LOW
+};
+
 struct Material
 {
 	std::string materialName = "";
@@ -131,7 +136,8 @@ struct ZoneLoadQueue {
 
 struct ModelDef {
 	std::string modelName = "";
-	std::string modelPath = "";
+	std::string modelPath_LOD1 = "";
+	std::string modelPath_LOD2 = "";
 };
 
 struct ModelPlacement {

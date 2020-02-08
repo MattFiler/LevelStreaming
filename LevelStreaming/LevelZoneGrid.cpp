@@ -2,8 +2,8 @@
 #include "SharedModelBuffers.h"
 #include "LevelZoneTile.h"
 
-/* Create the grid with 2D bottom left, top right points in world space, and a tile subdivision count */
-LevelZoneGrid::LevelZoneGrid(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd)
+/* Size the grid with 2D bottom left, top right points in world space, and a tile subdivision count */
+void LevelZoneGrid::Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd)
 {
 	bottomLeft = _bl;
 	topRight = _tr;

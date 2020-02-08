@@ -12,9 +12,10 @@ LevelZoneTile::~LevelZoneTile()
 }
 
 /* Load the zone tile */
-void LevelZoneTile::LoadTile()
+void LevelZoneTile::LoadTile(LevelOfDetail _lod)
 {
 	if (IsTileLoadedOrLoading()) return;
+	currentLOD = _lod;
 	isLoading = true;
 	isPushed = false;
 	std::thread* load_models = new std::thread([this] { LoadTileThread(); });
@@ -57,7 +58,12 @@ void LevelZoneTile::LoadTileThread()
 			{
 				Debug::Log("Loading model: " + models.at(i).modelName);
 				Model* new_model = new Model();
-				new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath));
+				switch (currentLOD) {
+				case LevelOfDetail::HIGH:
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD1));
+				case LevelOfDetail::LOW:
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD2));
+				}
 				new_model->SetPosition(models.at(i).position);
 				new_model->SetRotation(models.at(i).rotation);
 				new_model->SetScale(models.at(i).scale);

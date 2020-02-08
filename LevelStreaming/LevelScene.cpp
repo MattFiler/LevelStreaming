@@ -55,7 +55,8 @@ void LevelScene::Init()
 		{
 			ModelDef this_model = ModelDef();
 			this_model.modelName = models_json["MODELS"][i]["NAME"].get<std::string>();
-			this_model.modelPath = level_path + models_json["MODELS"][i]["PATH"].get<std::string>();
+			this_model.modelPath_LOD1 = level_path + models_json["MODELS"][i]["PATH_LOD1"].get<std::string>();
+			this_model.modelPath_LOD2 = level_path + models_json["MODELS"][i]["PATH_LOD2"].get<std::string>();
 			level_grid->AddLevelModel(this_model);
 		}
 	}
@@ -124,7 +125,7 @@ bool LevelScene::Update(double dt)
 		LevelZoneTile* activeTile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(main_cam.GetPosition().x, main_cam.GetPosition().z));
 		//TODO: do a neighbour loading thing here
 		if (activeTile) {
-			activeTile->LoadTile();
+			activeTile->LoadTile(LevelOfDetail::LOW);
 		}
 		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
 			if (level_grid->GetAllTiles()[i] != activeTile) level_grid->GetAllTiles()[i]->UnloadTile();

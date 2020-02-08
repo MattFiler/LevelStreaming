@@ -27,7 +27,7 @@ void EditorScene::Init()
 		allActiveModels.clear();
 		allActiveModelNames.clear();
 		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
-			level_grid->GetAllTiles()[i]->LoadTile();
+			level_grid->GetAllTiles()[i]->LoadTile(LevelOfDetail::HIGH);
 		}
 	}
 #endif
@@ -114,45 +114,62 @@ bool EditorScene::Update(double dt)
 			if (thisPos.z > topRight.y) topRight.y = thisPos.z + 1;
 		}
 
-		//Write new grid info
-		commands_json_out["BOUNDS"]["BOTTOM_LEFT"][0] = bottomLeft.x;
-		commands_json_out["BOUNDS"]["BOTTOM_LEFT"][1] = bottomLeft.y;
-		commands_json_out["BOUNDS"]["TOP_RIGHT"][0] = topRight.x;
-		commands_json_out["BOUNDS"]["TOP_RIGHT"][1] = topRight.y;
-		commands_json_out["SUBDIVISION"] = subdivisionCount;
-
+		//Make sure all models fall into the grid
+		level_grid->Resize(bottomLeft, topRight, subdivisionCount);
+		int failureCount = 0;
 		for (int i = 0; i < allActiveModels.size(); i++) {
-			commands_json_out["CONTENT"][i]["MODEL"] = allActiveModelNames.at(i);
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
-			commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
+			LevelZoneTile* tile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(allActiveModels[i]->GetPosition().x, allActiveModels[i]->GetPosition().z));
+			if (!tile) failureCount++;
 		}
+		if (failureCount != 0) 
+		{
+			//Not all models fall into grid, something wrong with the logic above that calculates bounds...
+			showPopup = true;
+			popupString = "Failed to save " + std::to_string(failureCount) + " models! Map editor logic error.";
+			Debug::Log(popupString);
+		}
+		else
+		{
+			//Write new grid info
+			commands_json_out["BOUNDS"]["BOTTOM_LEFT"][0] = bottomLeft.x;
+			commands_json_out["BOUNDS"]["BOTTOM_LEFT"][1] = bottomLeft.y;
+			commands_json_out["BOUNDS"]["TOP_RIGHT"][0] = topRight.x;
+			commands_json_out["BOUNDS"]["TOP_RIGHT"][1] = topRight.y;
+			commands_json_out["SUBDIVISION"] = subdivisionCount;
 
-		commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
-		commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
-		commands_json_out["PLAYER_SPAWN"]["POSITION"][2] = 0;
-		commands_json_out["PLAYER_SPAWN"]["ROTATION"][0] = 0;
-		commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
-		commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
+			for (int i = 0; i < allActiveModels.size(); i++) {
+				commands_json_out["CONTENT"][i]["MODEL"] = allActiveModelNames.at(i);
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
+				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
+			}
 
-		std::vector<uint8_t> bson = json::to_bson(commands_json_out);
-		std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
-		commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
-		commands_json_file.close();
+			commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
+			commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
+			commands_json_out["PLAYER_SPAWN"]["POSITION"][2] = 0;
+			commands_json_out["PLAYER_SPAWN"]["ROTATION"][0] = 0;
+			commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
+			commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
 
-		std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
-		commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
-		commands_json_file2.close();
+			std::vector<uint8_t> bson = json::to_bson(commands_json_out);
+			std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
+			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
+			commands_json_file.close();
 
-		showPopup = true;
-		popupString = "Saved level!";
-		Debug::Log(popupString);
+			std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
+			commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
+			commands_json_file2.close();
+
+			showPopup = true;
+			popupString = "Saved level!";
+			Debug::Log(popupString);
+		}
 	}
 	ImGui::End();
 
@@ -174,7 +191,7 @@ bool EditorScene::Update(double dt)
 		}
 		if (ImGui::Button("Add Selected Model")) {
 			Model* new_model = new Model();
-			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath));
+			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1));
 			new_model->Create();
 			GameObjectManager::AddObject(new_model);
 			allActiveModelNames.push_back(level_grid->levelModels.at(selectedNewModelIndex).modelName);

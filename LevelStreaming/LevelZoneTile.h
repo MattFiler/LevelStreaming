@@ -40,7 +40,7 @@ public:
 		models.push_back(_m);
 	}
 
-	void LoadTile();
+	void LoadTile(LevelOfDetail _lod);
 	void UnloadTile();
 
 	/* Is the tile loaded/loading? */
@@ -64,6 +64,8 @@ private:
 	DirectX::XMFLOAT2 bottomLeft;
 	DirectX::XMFLOAT2 topRight;
 	DirectX::XMFLOAT2 gridPos;
+
+	LevelOfDetail currentLOD = LevelOfDetail::LOW;
 
 	bool isLoading = false;
 	bool isLoaded = false;

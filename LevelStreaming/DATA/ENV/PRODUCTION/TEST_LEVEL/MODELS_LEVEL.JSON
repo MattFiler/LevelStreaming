@@ -2,39 +2,48 @@
 	"MODELS": [
 		{
 			"NAME": "DOOR_FRAME",
-			"PATH": "RENDERABLE/door_frame.obj"
+			"PATH_LOD1": "RENDERABLE/door_frame.obj",
+			"PATH_LOD2": "RENDERABLE/door_frame_optimised.obj"
 		},
 		{
 			"NAME": "DOOR",
-			"PATH": "RENDERABLE/door.obj"
+			"PATH_LOD1": "RENDERABLE/door.obj",
+			"PATH_LOD2": "RENDERABLE/door_optimised.obj"
 		},
 		{
 			"NAME": "PADDED_WALL",
-			"PATH": "RENDERABLE/padded_wall.obj"
+			"PATH_LOD1": "RENDERABLE/padded_wall.obj",
+			"PATH_LOD2": "RENDERABLE/padded_wall_optimised.obj"
 		},
 		{
 			"NAME": "FLOOR",
-			"PATH": "RENDERABLE/floor.obj"
+			"PATH_LOD1": "RENDERABLE/floor.obj",
+			"PATH_LOD2": "RENDERABLE/floor_optimised.obj"
 		},
 		{
 			"NAME": "FLOOR_CORNER",
-			"PATH": "RENDERABLE/floor_corner.obj"
+			"PATH_LOD1": "RENDERABLE/floor_corner.obj",
+			"PATH_LOD2": "RENDERABLE/floor_corner_optimised.obj"
 		},
 		{
 			"NAME": "CEILING",
-			"PATH": "RENDERABLE/ceiling.obj"
+			"PATH_LOD1": "RENDERABLE/ceiling.obj",
+			"PATH_LOD2": "RENDERABLE/ceiling_optimised.obj"
 		},
 		{
 			"NAME": "CEILING_CORNER",
-			"PATH": "RENDERABLE/ceiling_corner.obj"
+			"PATH_LOD1": "RENDERABLE/ceiling_corner.obj",
+			"PATH_LOD2": "RENDERABLE/ceiling_corner_optimised.obj"
 		},
 		{
 			"NAME": "PADDED_WALL_CORNER_EXT",
-			"PATH": "RENDERABLE/padded_wall_corner_ext.obj"
+			"PATH_LOD1": "RENDERABLE/padded_wall_corner_ext.obj",
+			"PATH_LOD2": "RENDERABLE/padded_wall_corner_ext_optimised.obj"
 		},
 		{
 			"NAME": "PADDED_WALL_CORNER_INT",
-			"PATH": "RENDERABLE/padded_wall_corner_int.obj"
+			"PATH_LOD1": "RENDERABLE/padded_wall_corner_int.obj",
+			"PATH_LOD2": "RENDERABLE/padded_wall_corner_int_optimised.obj"
 		}
 	]
 }
