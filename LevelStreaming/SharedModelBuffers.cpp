@@ -19,7 +19,6 @@ SharedModelBuffers::SharedModelBuffers(std::string path_to_obj, LevelOfDetail lo
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	vertexCount = allVerts.size();
-	Debug::Log(vertexCount);
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.ByteWidth = sizeof(SimpleVertex) * vertexCount;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;

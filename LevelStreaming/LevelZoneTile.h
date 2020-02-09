@@ -74,4 +74,5 @@ private:
 
 	std::vector<ModelPlacement> models = std::vector<ModelPlacement>();
 	std::vector<Model*> loadedModels = std::vector<Model*>();
+	std::vector<Model*> loadedModelsQueue = std::vector<Model*>();
 };
