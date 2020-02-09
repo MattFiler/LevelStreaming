@@ -97,8 +97,8 @@ bool LevelScene::Update(double dt)
 	ImGui::Separator();
 	ImGui::Checkbox("Lock Camera", &camLock);
 #ifdef _DEBUG
-	ImGui::SameLine();
-	ImGui::Checkbox("Show All Zones", &dxshared::drawBoundingBoxes);
+	//ImGui::SameLine();
+	//ImGui::Checkbox("Show All Zones", &dxshared::drawBoundingBoxes);
 #endif
 
 	ImGui::Separator();
@@ -120,15 +120,31 @@ bool LevelScene::Update(double dt)
 	main_cam.SetLocked(camLock);
 	GameObjectManager::Update(dt);
 
-	//Check to see if the camera (player) has entered a zone - call to load if it has
 	if (!in_editor_mode && level_grid) {
+		//Get the tile the camera (player) is currently within
 		LevelZoneTile* activeTile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(main_cam.GetPosition().x, main_cam.GetPosition().z));
-		//TODO: do a neighbour loading thing here
+		std::vector<LevelZoneTile*> loadedTiles = std::vector<LevelZoneTile*>();
 		if (activeTile) {
-			activeTile->LoadTile(LevelOfDetail::LOW);
+			//Load the tile we're within
+			activeTile->LoadTile(LevelOfDetail::HIGH);
+			loadedTiles.push_back(activeTile);
+
+			//Get neighbours to the tile we're within, and load them at a lower LOD
+			std::vector<LevelZoneTile*> neighbourTiles = level_grid->GetTileNeighbours(activeTile).AllNeighbours;
+			for (int i = 0; i < neighbourTiles.size(); i++) {
+				neighbourTiles[i]->LoadTile(LevelOfDetail::LOW);
+				loadedTiles.push_back(neighbourTiles[i]);
+			}
 		}
+
+		//Unload all inactive tiles
 		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
-			if (level_grid->GetAllTiles()[i] != activeTile) level_grid->GetAllTiles()[i]->UnloadTile();
+			bool shouldUnload = true;
+			for (int x = 0; x < loadedTiles.size(); x++) {
+				if (level_grid->GetAllTiles()[i] == loadedTiles[x]) shouldUnload = false;
+			}
+			if (!shouldUnload) continue; //Only unload old LODs
+			level_grid->GetAllTiles()[i]->UnloadTile(); //Unload everything if loaded
 		}
 	}
 

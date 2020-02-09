@@ -12,6 +12,7 @@ void LevelZoneGrid::Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd
 	tileDims = DirectX::XMFLOAT2(gridDims.x / _sd, gridDims.y / _sd);
 	subdivisionCount = _sd;
 
+	levelTiles.clear();
 	for (int x = 0; x < _sd; x++) {
 		for (int y = 0; y < _sd; y++) {
 			LevelZoneTile* newTile = new LevelZoneTile(
@@ -130,17 +131,18 @@ void LevelZoneGrid::TrackLoading()
 }
 
 /* Requested load of model: check our existing loaded data, and if not already loaded, load it */
-SharedModelBuffers * LevelZoneGrid::LoadModelToLevel(std::string model_path)
+SharedModelBuffers * LevelZoneGrid::LoadModelToLevel(std::string model_path, LevelOfDetail lod)
 {
 	//Return an already loaded model buffer, if it exists
 	for (int i = 0; i < loadedModels.size(); i++) {
 		if (loadedModels[i]->GetFilePath() == model_path) {
+			Debug::Log("Pulling model from pool.");
 			return loadedModels[i];
 		}
 	}
 
 	//Model isn't already loaded - load it
-	SharedModelBuffers* newLoadedModel = new SharedModelBuffers(model_path);
+	SharedModelBuffers* newLoadedModel = new SharedModelBuffers(model_path, lod);
 	loadedModels.push_back(newLoadedModel);
 	return newLoadedModel;
 }

@@ -55,7 +55,7 @@ public:
 	void TrackLoading();
 
 private:
-	SharedModelBuffers* LoadModelToLevel(std::string model_path);
+	SharedModelBuffers* LoadModelToLevel(std::string model_path, LevelOfDetail lod);
 
 	DirectX::XMFLOAT2 bottomLeft;
 	DirectX::XMFLOAT2 topRight;

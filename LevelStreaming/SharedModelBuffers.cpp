@@ -1,10 +1,12 @@
 #include "SharedModelBuffers.h"
 
 /* Load a model and create the buffers */
-SharedModelBuffers::SharedModelBuffers(std::string path_to_obj)
+SharedModelBuffers::SharedModelBuffers(std::string path_to_obj, LevelOfDetail lod)
 {
 	//Push data for our vertex buffer, and create children index buffers
+	Debug::Log("Loading model from disk.");
 	objPath = path_to_obj;
+	thisLOD = lod;
 	LoadedModel _m = dxutils.LoadModel(path_to_obj);
 	for (int i = 0; i < _m.modelParts.size(); i++) {
 		for (int x = 0; x < _m.modelParts[i].compVertices.size(); x++) {
@@ -86,6 +88,7 @@ SharedModelBuffers::~SharedModelBuffers()
 void SharedModelBuffers::Render(XMMATRIX mWorld)
 {
 	if (vertexCount == 0) return;
+	if (allModels.size() == 0) return;
 
 	//Set shaders to use
 	dxshared::m_pImmediateContext->VSSetShader(m_vertexShader, nullptr, 0);

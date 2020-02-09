@@ -191,7 +191,7 @@ bool EditorScene::Update(double dt)
 		}
 		if (ImGui::Button("Add Selected Model")) {
 			Model* new_model = new Model();
-			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1));
+			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1, LevelOfDetail::HIGH));
 			new_model->Create();
 			GameObjectManager::AddObject(new_model);
 			allActiveModelNames.push_back(level_grid->levelModels.at(selectedNewModelIndex).modelName);
@@ -205,6 +205,9 @@ bool EditorScene::Update(double dt)
 		}
 		ImGui::End();
 	}
+
+	//Check our model buffers again (tacked on for editor)
+	if (level_grid) level_grid->TrackLoading();
 
 	//Only continue if our requested edit object is valid
 	if (allActiveModels.size() <= selectedEditModel) return true;

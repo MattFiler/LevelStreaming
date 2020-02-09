@@ -57,7 +57,7 @@ public:
 	void TrackLoading();
 
 private:
-	void LoadTileThread();
+	void LoadTileThread(LevelOfDetail _lod);
 
 	LevelZoneGrid* mainGrid = nullptr;
 

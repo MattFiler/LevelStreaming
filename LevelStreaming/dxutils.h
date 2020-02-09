@@ -482,7 +482,6 @@ public:
 								}
 							}
 							currentMaterial.texturePath = texPrepend + "/" + currentMaterial.texturePath;
-							Debug::Log(currentMaterial.texturePath);
 						}
 					}
 				}
@@ -530,7 +529,6 @@ public:
 			}
 		}
 		thisModel.modelParts.push_back(modelPart);
-		Debug::Log(std::to_string(thisModel.modelParts.size()));
 		return thisModel;
 	}
 

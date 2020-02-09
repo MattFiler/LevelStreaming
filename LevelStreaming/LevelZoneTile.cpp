@@ -14,18 +14,28 @@ LevelZoneTile::~LevelZoneTile()
 /* Load the zone tile */
 void LevelZoneTile::LoadTile(LevelOfDetail _lod)
 {
-	if (IsTileLoadedOrLoading()) return;
+	if (IsTileLoadedOrLoading()) {
+		if (IsTileLoaded() && currentLOD != _lod) {
+			UnloadTile();
+		}
+		return;
+	}
+	Debug::Log("Loading zone...");
+
 	currentLOD = _lod;
 	isLoading = true;
 	isPushed = false;
-	std::thread* load_models = new std::thread([this] { LoadTileThread(); });
+
+	std::thread* load_models = new std::thread([_lod, this] { LoadTileThread(_lod); });
 }
 
-/* Unload the zone tile */
+/* Unload the zone tile (if forceAll, all unload, else, only old LODs unload) */
 void LevelZoneTile::UnloadTile()
 {
-	if (!IsTileLoadedOrLoading()) return;
-
+	if (!IsTileLoaded()) return;
+	if (IsTileLoading()) return;
+	Debug::Log("Unloading zone...");
+	
 	for (int i = 0; i < loadedModels.size(); i++)
 	{
 		GameObjectManager::RemoveObject(loadedModels[i]);
@@ -39,6 +49,7 @@ void LevelZoneTile::UnloadTile()
 void LevelZoneTile::TrackLoading()
 {
 	if (isLoaded && !isPushed) {
+		Debug::Log("Zone load completed!");
 		for (int x = 0; x < loadedModels.size(); x++)
 		{
 			GameObjectManager::AddObject(loadedModels.at(x));
@@ -48,7 +59,7 @@ void LevelZoneTile::TrackLoading()
 }
 
 /* Load the contents of this zone tile */
-void LevelZoneTile::LoadTileThread()
+void LevelZoneTile::LoadTileThread(LevelOfDetail _lod)
 {
 	for (int i = 0; i < models.size(); i++)
 	{
@@ -56,13 +67,15 @@ void LevelZoneTile::LoadTileThread()
 		{
 			if (mainGrid->levelModels[x].modelName == models.at(i).modelName)
 			{
-				Debug::Log("Loading model: " + models.at(i).modelName);
+				Debug::Log("Creating instance of model: " + models.at(i).modelName);
 				Model* new_model = new Model();
-				switch (currentLOD) {
+				switch (_lod) {
 				case LevelOfDetail::HIGH:
-					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD1));
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD1, _lod));
+					break;
 				case LevelOfDetail::LOW:
-					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD2));
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD2, _lod));
+					break;
 				}
 				new_model->SetPosition(models.at(i).position);
 				new_model->SetRotation(models.at(i).rotation);

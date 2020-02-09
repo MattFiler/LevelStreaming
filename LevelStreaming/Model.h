@@ -19,6 +19,10 @@ public:
 		modelData = _m;
 	}
 
+	LevelOfDetail GetLOD() {
+		return modelData->GetLOD();
+	}
+
 private:
 	SharedModelBuffers* modelData = nullptr;
 };
