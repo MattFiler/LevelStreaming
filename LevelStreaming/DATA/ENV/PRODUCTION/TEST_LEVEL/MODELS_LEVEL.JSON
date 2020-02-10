@@ -1,5 +1,5 @@
 {
-	"MODELS": [
+	"MODEL_DEFS": [
 		{
 			"NAME": "DOOR_FRAME",
 			"PATH_LOD1": "RENDERABLE/door_frame.obj",

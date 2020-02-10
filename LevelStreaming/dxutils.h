@@ -87,7 +87,8 @@ enum VertReaderType
 
 enum LevelOfDetail {
 	HIGH,
-	LOW
+	LOW,
+	UNLOADED
 };
 
 struct Material

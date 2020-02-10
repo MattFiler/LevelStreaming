@@ -111,13 +111,17 @@ LevelZoneTileNeighbours LevelZoneGrid::GetTileNeighbours(LevelZoneTile * _t)
 /* Keep track of load states on all tiles (should call on update) */
 void LevelZoneGrid::TrackLoading()
 {
+	//Track zone loading
 	bool noneAreLoading = true;
 	for (int i = 0; i < levelTiles.size(); i++) {
 		levelTiles[i]->TrackLoading();
 		if (levelTiles[i]->IsTileLoading()) noneAreLoading = false;
 	}
-	if (!noneAreLoading) return;
 
+	//Track NPC loading
+	//Check where NPCs are, and the LOD of the tile they're in
+
+	if (!noneAreLoading) return;
 	//Check to see if any model buffers aren't in use anymore - delete them if so
 	std::vector<SharedModelBuffers*> loadedModelsUpdated = std::vector<SharedModelBuffers*>();
 	for (int i = 0; i < loadedModels.size(); i++) {

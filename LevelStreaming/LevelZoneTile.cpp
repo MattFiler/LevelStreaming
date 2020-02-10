@@ -1,4 +1,5 @@
 #include "LevelZoneTile.h"
+#include "LevelZoneGrid.h"
 #include "Model.h"
 
 LevelZoneTile::~LevelZoneTile()

@@ -137,19 +137,21 @@ bool EditorScene::Update(double dt)
 			commands_json_out["BOUNDS"]["TOP_RIGHT"][1] = topRight.y;
 			commands_json_out["SUBDIVISION"] = subdivisionCount;
 
+			//Write models
 			for (int i = 0; i < allActiveModels.size(); i++) {
-				commands_json_out["CONTENT"][i]["MODEL"] = allActiveModelNames.at(i);
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
-				commands_json_out["CONTENT"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
+				commands_json_out["MODELS"][i]["MODEL"] = allActiveModelNames.at(i);
+				commands_json_out["MODELS"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
+				commands_json_out["MODELS"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
 			}
 
+			//Write player spawn (todo: a player spawn position widget)
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][0] = 0;
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][1] = 0;
 			commands_json_out["PLAYER_SPAWN"]["POSITION"][2] = 0;
@@ -157,11 +159,13 @@ bool EditorScene::Update(double dt)
 			commands_json_out["PLAYER_SPAWN"]["ROTATION"][1] = 0;
 			commands_json_out["PLAYER_SPAWN"]["ROTATION"][2] = 0;
 
+			//Write out to BSON for production
 			std::vector<uint8_t> bson = json::to_bson(commands_json_out);
 			std::ofstream commands_json_file(level_path + "COMMANDS.BIN", std::ios::out | std::ios::binary);
 			commands_json_file.write((char*)&bson[0], bson.size() * sizeof(uint8_t));
 			commands_json_file.close();
 
+			//Write out to JSON for debugging
 			std::ofstream commands_json_file2(level_path + "COMMANDS.JSON");
 			commands_json_file2 << std::setw(4) << commands_json_out << std::endl;
 			commands_json_file2.close();

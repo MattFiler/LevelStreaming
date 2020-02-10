@@ -31,32 +31,38 @@ void LevelScene::Init()
 		DirectX::XMFLOAT2 gridTopRight = DirectX::XMFLOAT2(commands_json["BOUNDS"]["TOP_RIGHT"][0], commands_json["BOUNDS"]["TOP_RIGHT"][1]);
 		level_grid = new LevelZoneGrid(gridBottomLeft, gridTopRight, commands_json["SUBDIVISION"]);
 
-		//Populate the zone grid
-		for (int i = 0; i < commands_json["CONTENT"].size(); i++) {
-			json this_placement_json = commands_json["CONTENT"][i];
+		//Load all NPC placements to the whole grid
+		for (int i = 0; i < commands_json["NPCS"].size(); i++) {
+			json this_placement_json = commands_json["NPCS"][i];
+			//todo
+		}
+
+		//Load all trigger placements to the whole grid
+		for (int i = 0; i < commands_json["TRIGGERS"].size(); i++) {
+			json this_placement_json = commands_json["TRIGGERS"][i];
+			//todo
+		}
+
+		//Load all model placements to tiles
+		for (int i = 0; i < commands_json["MODELS"].size(); i++) {
+			json this_placement_json = commands_json["MODELS"][i];
 			ModelPlacement this_placement = ModelPlacement();
 			this_placement.modelName = this_placement_json["MODEL"].get<std::string>();
 			this_placement.position = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["POSITION"][0], this_placement_json["PLACEMENT"]["POSITION"][1], this_placement_json["PLACEMENT"]["POSITION"][2]);
 			this_placement.rotation = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["ROTATION"][0], this_placement_json["PLACEMENT"]["ROTATION"][1], this_placement_json["PLACEMENT"]["ROTATION"][2]);
 			this_placement.scale = DirectX::XMFLOAT3(this_placement_json["PLACEMENT"]["SCALE"][0], this_placement_json["PLACEMENT"]["SCALE"][1], this_placement_json["PLACEMENT"]["SCALE"][2]);
 			LevelZoneTile* tile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(this_placement.position.x, this_placement.position.z));
-			if (tile)
-			{
-				tile->AddModelRef(this_placement);
-			}
-			else
-			{
-				Debug::Log("ERROR: Tried to load a model " + this_placement.modelName + " to tile, but no tile covers its origin. Map editor failure!");
-			}
+			if (tile) tile->AddModelRef(this_placement);
+			else Debug::Log("ERROR: Tried to load a model " + this_placement.modelName + " to tile, but no tile covers its origin. Map editor failure!");
 		}
 
 		//Load all model metadata
-		for (int i = 0; i < models_json["MODELS"].size(); i++)
+		for (int i = 0; i < models_json["MODEL_DEFS"].size(); i++)
 		{
 			ModelDef this_model = ModelDef();
-			this_model.modelName = models_json["MODELS"][i]["NAME"].get<std::string>();
-			this_model.modelPath_LOD1 = level_path + models_json["MODELS"][i]["PATH_LOD1"].get<std::string>();
-			this_model.modelPath_LOD2 = level_path + models_json["MODELS"][i]["PATH_LOD2"].get<std::string>();
+			this_model.modelName = models_json["MODEL_DEFS"][i]["NAME"].get<std::string>();
+			this_model.modelPath_LOD1 = level_path + models_json["MODEL_DEFS"][i]["PATH_LOD1"].get<std::string>();
+			this_model.modelPath_LOD2 = level_path + models_json["MODEL_DEFS"][i]["PATH_LOD2"].get<std::string>();
 			level_grid->AddLevelModel(this_model);
 		}
 	}

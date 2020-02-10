@@ -1,9 +1,9 @@
 #pragma once
 
 #include "dxutils.h"
-#include "LevelZoneGrid.h"
 
 class Model;
+class LevelZoneGrid;
 
 /* A zone tile within the level grid */
 class LevelZoneTile {
@@ -52,6 +52,10 @@ public:
 	}
 	bool IsTileLoadedOrLoading() {
 		return isLoading || isLoaded;
+	}
+
+	LevelOfDetail GetLOD() {
+		return currentLOD;
 	}
 
 	void TrackLoading();

@@ -4,6 +4,7 @@
 
 class SharedModelBuffers;
 class LevelZoneTile;
+class NPC;
 
 /* A struct for returning refs to neighbours of a zone tile */
 struct LevelZoneTileNeighbours {
@@ -44,6 +45,9 @@ public:
 	void AddLevelModel(ModelDef _m) {
 		levelModels.push_back(_m);
 	}
+	void AddNPC(NPC* _npc) {
+		levelNPCs.push_back(_npc);
+	}
 
 	LevelZoneTile* GetTileAtPosition(DirectX::XMFLOAT2 _p);
 	LevelZoneTile* GetTileAtGridPos(DirectX::XMFLOAT2 _gp);
@@ -64,7 +68,8 @@ private:
 	DirectX::XMFLOAT2 tileDims;
 	int subdivisionCount;
 
-	std::vector<LevelZoneTile*> levelTiles = std::vector<LevelZoneTile*>();
-	std::vector<ModelDef> levelModels = std::vector<ModelDef>();
-	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>();
+	std::vector<LevelZoneTile*> levelTiles = std::vector<LevelZoneTile*>();             //All tiles in the level
+	std::vector<ModelDef> levelModels = std::vector<ModelDef>();                        //Definitions of paths to model LODs
+	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>(); //Loaded model buffers
+	std::vector<NPC*> levelNPCs = std::vector<NPC*>();                                  //All NPCs in the level
 };

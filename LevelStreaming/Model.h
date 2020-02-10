@@ -20,9 +20,10 @@ public:
 	}
 
 	LevelOfDetail GetLOD() {
-		return modelData->GetLOD();
+		if (modelData) return modelData->GetLOD();
+		return LevelOfDetail::UNLOADED;
 	}
 
-private:
+protected:
 	SharedModelBuffers* modelData = nullptr;
 };

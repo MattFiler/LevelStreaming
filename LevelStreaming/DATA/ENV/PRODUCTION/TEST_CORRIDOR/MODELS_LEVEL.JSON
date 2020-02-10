@@ -1,5 +1,5 @@
 {
-	"MODELS": [
+	"MODEL_DEFS": [
 		{
 			"NAME": "TEST_CORRIDOR_HALF",
 			"PATH": "RENDERABLE/corridor_bit.obj"

@@ -22,7 +22,31 @@
             0
         ]
     },
-    "CONTENT": [
+	"NPCS": [
+		{
+			"NAME": "Some Goon",
+			"MODEL": "ELLEN_RIPLEY",
+			"PLACEMENT": {
+				"POSITION": [
+					0.0,
+					0.0,
+					-51.0
+				],
+				"ROTATION": [
+					90.0,
+					0.0,
+					0.0
+				],
+				"SCALE": [
+					1.0,
+					1.0,
+					1.0
+				]
+			}
+		}
+	],
+	"TRIGGERS": [],
+    "MODELS": [
 		{
 			"MODEL": "TEST_CORRIDOR_HALF",
 			"PLACEMENT": {
