@@ -21,7 +21,7 @@ void NPC::Update(float dt)
 	Model::Update(dt);
 
 	if (!isActive) return;
-	if (dt == 0) return;
+	if (dt == 0 || pathingPoints.size() == 0 || dxshared::pauseNPCs) return;
 	float tx = pathingPoints[currentPathingPointTarget].x - position.x;
 	float ty = pathingPoints[currentPathingPointTarget].y - position.y;
 	float tz = pathingPoints[currentPathingPointTarget].z - position.z;

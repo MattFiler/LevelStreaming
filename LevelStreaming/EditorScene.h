@@ -17,13 +17,19 @@ private:
 #if _DEBUG
 	json commands_json_out;
 
+	int currentEditorMode = 0; //0 = npcs, 1 = triggers, 2 = npcs, 3 = player spawn
+
 	int selectedEditModel = 0;
 	int selectedNewModelIndex = 0;
+
+	int selectedEditNPC = 0;
 
 	int subdivisionCount = 10;
 
 	bool hasDoneEditorPreload = false;
 	bool showModelSelector = false;
+	bool showNpcModelSelector = false;
+	bool showNpcEditor = false;
 	bool showPopup = false;
 	std::string popupString = "";
 

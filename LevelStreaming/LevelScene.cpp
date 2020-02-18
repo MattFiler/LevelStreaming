@@ -119,10 +119,12 @@ bool LevelScene::Update(double dt)
 
 	ImGui::Text("Scene Controls");
 	ImGui::Separator();
-	ImGui::Checkbox("Lock Camera", &camLock);
+	ImGui::Checkbox("Lock Cam", &camLock);
 #ifdef _DEBUG
-	//ImGui::SameLine();
-	//ImGui::Checkbox("Show All Zones", &dxshared::drawBoundingBoxes);
+	ImGui::SameLine();
+	ImGui::Checkbox("Show Triggers", &dxshared::drawBoundingBoxes);
+	ImGui::SameLine();
+	ImGui::Checkbox("Stop NPCs", &dxshared::pauseNPCs);
 #endif
 
 	ImGui::Separator();

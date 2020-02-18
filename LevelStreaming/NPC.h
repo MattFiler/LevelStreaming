@@ -22,9 +22,18 @@ public:
 	void SetName(std::string _n) {
 		npcName = _n;
 	}
+	std::string GetName() {
+		return npcName;
+	}
 
 	void AddPathingPoint(DirectX::XMFLOAT3 _point) {
 		pathingPoints.push_back(_point);
+	}
+	void RemovePathingPoints() {
+		pathingPoints.clear();
+	}
+	std::vector<DirectX::XMFLOAT3> GetPathingPoints() {
+		return pathingPoints;
 	}
 
 	void SetPathingSpeed(float _speed) {

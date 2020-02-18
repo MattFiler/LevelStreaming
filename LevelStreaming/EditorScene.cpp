@@ -16,9 +16,13 @@ void EditorScene::Init()
 
 #if _DEBUG
 	selectedEditModel = 0;
+	selectedEditNPC = 0;
 	subdivisionCount = (level_grid) ? level_grid->subdivisionCount : 10;
 	selectedNewModelIndex = 0;
+	hasDoneEditorPreload = false; //?
 	showModelSelector = false;
+	showNpcModelSelector = false;
+	showNpcEditor = false;
 	showPopup = false;
 	dxshared::mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
 
@@ -73,29 +77,88 @@ bool EditorScene::Update(double dt)
 	ImGui::Separator();
 
 	//Zone edit controls
-	ImGui::Text("Zones Generation Properties");
+	ImGui::Text("Zone Generation Properties");
 	ImGui::InputInt("Subdivision", &subdivisionCount);
 	if (subdivisionCount < 1) subdivisionCount = 1;
 	ImGui::Separator();
 
-	//Model edit controls
-	ImGui::Text("Edit Level Models");
+	ImGui::RadioButton("Edit NPCs", &currentEditorMode, 0); ImGui::SameLine();
+	ImGui::RadioButton("Edit Triggers", &currentEditorMode, 1);
+	ImGui::RadioButton("Edit Models", &currentEditorMode, 2); ImGui::SameLine();
+	ImGui::RadioButton("Edit Spawnpoint", &currentEditorMode, 3);
 	ImGui::Separator();
-	if (ImGui::Button("Add New Model")) {
-		selectedNewModelIndex = 0;
-		showModelSelector = true;
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Remove Selected Model")) {
-		GameObjectManager::RemoveObject(allActiveModels.at(selectedEditModel));
-		delete allActiveModels.at(selectedEditModel);
-		allActiveModels.erase(allActiveModels.begin() + selectedEditModel);
-		allActiveModelNames.erase(allActiveModelNames.begin() + selectedEditModel);
-	}
-	if (ImGui::CollapsingHeader("Models In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
-		for (int x = 0; x < allActiveModels.size(); x++) {
-			ImGui::RadioButton(("[" + std::to_string(x) + "] - " + allActiveModelNames.at(x)).c_str(), &selectedEditModel, x);
-		}
+	switch (currentEditorMode) {
+		case 0:
+			//NPC edit controls
+			ImGui::Text("Edit Level NPCs");
+			ImGui::Separator();
+			if (ImGui::Button("Add New NPC")) {
+				selectedNewModelIndex = 0;
+				showNpcModelSelector = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Remove Selected NPC")) {
+				GameObjectManager::RemoveObject(level_grid->levelNPCs.at(selectedEditNPC));
+				delete level_grid->levelNPCs.at(selectedEditNPC);
+				level_grid->levelNPCs.erase(level_grid->levelNPCs.begin() + selectedEditNPC);
+			}
+			if (ImGui::CollapsingHeader("NPCs In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
+				for (int x = 0; x < level_grid->levelNPCs.size(); x++) {
+					ImGui::RadioButton(("[" + std::to_string(x) + "] - " + level_grid->levelNPCs.at(x)->GetName()).c_str(), &selectedEditNPC, x);
+				}
+			}
+			if (ImGui::Button("Edit NPC Waypoints & Speed")) {
+				showNpcEditor = true;
+			}
+			break;
+		case 1:
+			//Trigger edit controls
+			ImGui::Text("Edit Level Triggers");
+			ImGui::Text("WIP");
+			break;
+			ImGui::Separator();
+			if (ImGui::Button("Add New Trigger")) {
+				selectedNewModelIndex = 0;
+				showModelSelector = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Remove Selected Trigger")) {
+				GameObjectManager::RemoveObject(level_grid->levelNPCs.at(selectedEditNPC));
+				delete level_grid->levelNPCs.at(selectedEditNPC);
+				level_grid->levelNPCs.erase(level_grid->levelNPCs.begin() + selectedEditNPC);
+			}
+			if (ImGui::CollapsingHeader("Triggers In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
+				for (int x = 0; x < level_grid->levelNPCs.size(); x++) {
+					ImGui::RadioButton(("[" + std::to_string(x) + "] - " + level_grid->levelNPCs.at(x)->GetName()).c_str(), &selectedEditNPC, x);
+				}
+			}
+			break;
+		case 2:
+			//Model edit controls
+			ImGui::Text("Edit Level Models");
+			ImGui::Separator();
+			if (ImGui::Button("Add New Model")) {
+				selectedNewModelIndex = 0;
+				showModelSelector = true;
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Remove Selected Model")) {
+				GameObjectManager::RemoveObject(allActiveModels.at(selectedEditModel));
+				delete allActiveModels.at(selectedEditModel);
+				allActiveModels.erase(allActiveModels.begin() + selectedEditModel);
+				allActiveModelNames.erase(allActiveModelNames.begin() + selectedEditModel);
+			}
+			if (ImGui::CollapsingHeader("Models In Level", ImGuiTreeNodeFlags_DefaultOpen)) {
+				for (int x = 0; x < allActiveModels.size(); x++) {
+					ImGui::RadioButton(("[" + std::to_string(x) + "] - " + allActiveModelNames.at(x)).c_str(), &selectedEditModel, x);
+				}
+			}
+			break;
+		case 3:
+			//Player spawn edit controls
+			ImGui::Text("Edit Level Spawnpoint");
+			ImGui::Text("WIP");
+			break;
 	}
 	ImGui::Separator();
 
@@ -136,6 +199,37 @@ bool EditorScene::Update(double dt)
 			commands_json_out["BOUNDS"]["TOP_RIGHT"][0] = topRight.x;
 			commands_json_out["BOUNDS"]["TOP_RIGHT"][1] = topRight.y;
 			commands_json_out["SUBDIVISION"] = subdivisionCount;
+
+			//Write NPCs
+			for (int i = 0; i < level_grid->levelNPCs.size(); i++) {
+				commands_json_out["NPCS"][i]["MODEL"] = level_grid->levelNPCs.at(i)->GetModelName();
+				commands_json_out["NPCS"][i]["PLACEMENT"]["POSITION"][0] = allActiveModels.at(i)->GetPosition().x;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["POSITION"][1] = allActiveModels.at(i)->GetPosition().y;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["POSITION"][2] = allActiveModels.at(i)->GetPosition().z;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["ROTATION"][0] = allActiveModels.at(i)->GetRotation(false).x;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["ROTATION"][1] = allActiveModels.at(i)->GetRotation(false).y;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["ROTATION"][2] = allActiveModels.at(i)->GetRotation(false).z;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["SCALE"][0] = allActiveModels.at(i)->GetScale().x;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["SCALE"][1] = allActiveModels.at(i)->GetScale().y;
+				commands_json_out["NPCS"][i]["PLACEMENT"]["SCALE"][2] = allActiveModels.at(i)->GetScale().z;
+				commands_json_out["NPCS"][i]["NPC_NAME"] = level_grid->levelNPCs.at(i)->GetName();
+				for (int x = 0; x < level_grid->levelNPCs.at(i)->GetPathingPoints().size(); x++) {
+					commands_json_out["NPCS"][i]["PATHING_POINTS"][x][0] = level_grid->levelNPCs.at(i)->GetPathingPoints().at(x).x;
+					commands_json_out["NPCS"][i]["PATHING_POINTS"][x][1] = level_grid->levelNPCs.at(i)->GetPathingPoints().at(x).y;
+					commands_json_out["NPCS"][i]["PATHING_POINTS"][x][2] = level_grid->levelNPCs.at(i)->GetPathingPoints().at(x).z;
+				}
+				commands_json_out["NPCS"][i]["PATHING_SPEED"] = level_grid->levelNPCs.at(i)->GetPathingSpeed();
+			}
+
+			//Write triggers
+			for (int i = 0; i < level_grid->levelTriggers.size(); i++) {
+				commands_json_out["TRIGGERS"][i]["BOTTOM_LEFT"][0] = level_grid->levelTriggers.at(i)->GetDims().localBottomLeft.x + level_grid->levelTriggers.at(i)->GetPosition().x;
+				commands_json_out["TRIGGERS"][i]["BOTTOM_LEFT"][1] = level_grid->levelTriggers.at(i)->GetDims().localBottomLeft.y + level_grid->levelTriggers.at(i)->GetPosition().y;
+				commands_json_out["TRIGGERS"][i]["BOTTOM_LEFT"][2] = level_grid->levelTriggers.at(i)->GetDims().localBottomLeft.z + level_grid->levelTriggers.at(i)->GetPosition().z;
+				commands_json_out["TRIGGERS"][i]["TOP_RIGHT"][0] = level_grid->levelTriggers.at(i)->GetDims().localTopRight.x + level_grid->levelTriggers.at(i)->GetPosition().x;
+				commands_json_out["TRIGGERS"][i]["TOP_RIGHT"][1] = level_grid->levelTriggers.at(i)->GetDims().localTopRight.y + level_grid->levelTriggers.at(i)->GetPosition().y;
+				commands_json_out["TRIGGERS"][i]["TOP_RIGHT"][2] = level_grid->levelTriggers.at(i)->GetDims().localTopRight.z + level_grid->levelTriggers.at(i)->GetPosition().z;
+			}
 
 			//Write models
 			for (int i = 0; i < allActiveModels.size(); i++) {
@@ -187,7 +281,7 @@ bool EditorScene::Update(double dt)
 		ImGui::End();
 	}
 
-	//Allow a new model to be added to the scene from our model pool
+	//Allow a new model to be added to the scene from our model pool (FOR LEVEL GEO)
 	if (showModelSelector) {
 		ImGui::Begin("Available Models", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 		for (int i = 0; i < level_grid->levelModels.size(); i++) {
@@ -207,6 +301,43 @@ bool EditorScene::Update(double dt)
 			showPopup = true;
 			popupString = "Added new model: " + level_grid->levelModels.at(selectedNewModelIndex).modelName;
 		}
+		ImGui::End();
+	}
+
+	//Allow a new model to be added to the scene from our model pool (FOR NPCS)
+	if (showNpcModelSelector) {
+		ImGui::Begin("NPC Creator", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+		ImGui::Text("NPC Model");
+		ImGui::Separator();
+		for (int i = 0; i < level_grid->levelModels.size(); i++) {
+			ImGui::RadioButton((level_grid->levelModels.at(i).modelName).c_str(), &selectedNewModelIndex, i);
+		}
+		ImGui::Separator(); 
+		char npcName[128] = ""; ImGui::Text("NPC Name"); ImGui::SameLine();
+		if (ImGui::InputText("", npcName, IM_ARRAYSIZE(npcName), ImGuiInputTextFlags_EnterReturnsTrue)) {
+			std::string newNpcName(npcName);
+
+			NPC* new_npc = new NPC();
+			new_npc->SetName(newNpcName);
+			new_npc->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1, LevelOfDetail::HIGH));
+			new_npc->Create();
+			new_npc->CreateModel();
+			GameObjectManager::AddObject(new_npc);
+			level_grid->AddNPC(new_npc);
+
+			selectedEditNPC = level_grid->levelNPCs.size() - 1;
+
+			showNpcModelSelector = false;
+			showPopup = true;
+			popupString = "Added new NPC: " + newNpcName;
+		}
+		ImGui::End();
+	}
+
+	//Let the user add/remove NPC waypoints, and change their speed
+	if (showNpcEditor) {
+		ImGui::Begin("NPC Editor", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+		ImGui::Text("WIP");
 		ImGui::End();
 	}
 
