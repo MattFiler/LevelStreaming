@@ -44,6 +44,11 @@
 			"NAME": "PADDED_WALL_CORNER_INT",
 			"PATH_LOD1": "RENDERABLE/padded_wall_corner_int.obj",
 			"PATH_LOD2": "RENDERABLE/padded_wall_corner_int_optimised.obj"
+		},
+		{
+			"NAME": "DEMO_CHARACTER",
+			"PATH_LOD1": "RENDERABLE/demo_character.obj",
+			"PATH_LOD2": "RENDERABLE/demo_character_optimised.obj"
 		}
 	]
 }

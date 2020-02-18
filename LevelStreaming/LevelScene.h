@@ -8,6 +8,9 @@ class LevelScene : public Scene
 {
 public:
 	LevelScene(std::string levelName, std::string levelPath, LevelType levelType);
+	~LevelScene() {
+		Release();
+	}
 
 	void Init() override;
 	void Release() override;

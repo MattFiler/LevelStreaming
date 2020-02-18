@@ -1,6 +1,32 @@
 #include "LevelZoneGrid.h"
 #include "SharedModelBuffers.h"
 #include "LevelZoneTile.h"
+#include "NPC.h"
+#include "BoundingBox.h"
+#include "Camera.h"
+
+LevelZoneGrid::~LevelZoneGrid()
+{
+	for (int i = 0; i < levelTiles.size(); i++) {
+		delete levelTiles[i];
+	}
+	levelTiles.clear();
+	for (int i = 0; i < loadedModels.size(); i++) {
+		delete loadedModels[i];
+	}
+	loadedModels.clear();
+	levelModels.clear();
+	for (int i = 0; i < levelNPCs.size(); i++) {
+		levelNPCs[i]->Release();
+		delete levelNPCs[i];
+	}
+	levelNPCs.clear();
+	for (int i = 0; i < levelTriggers.size(); i++) {
+		levelTriggers[i]->Release();
+		delete levelTriggers[i];
+	}
+	levelTriggers.clear();
+}
 
 /* Size the grid with 2D bottom left, top right points in world space, and a tile subdivision count */
 void LevelZoneGrid::Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd)
@@ -118,8 +144,10 @@ void LevelZoneGrid::TrackLoading()
 		if (levelTiles[i]->IsTileLoading()) noneAreLoading = false;
 	}
 
-	//Track NPC loading
-	//Check where NPCs are, and the LOD of the tile they're in
+	//Show/hide NPCs depending on the active-ness of the tile they're in
+	for (int i = 0; i < levelNPCs.size(); i++) {
+		//levelNPCs[i]->SetInvisible(GetTileAtPosition(DirectX::XMFLOAT2(levelNPCs[i]->GetPosition().x, levelNPCs[i]->GetPosition().y))->IsTileLoadedOrLoading());
+	}
 
 	if (!noneAreLoading) return;
 	//Check to see if any model buffers aren't in use anymore - delete them if so
@@ -132,6 +160,37 @@ void LevelZoneGrid::TrackLoading()
 		loadedModelsUpdated.push_back(loadedModels[i]);
 	}
 	loadedModels = loadedModelsUpdated;
+}
+
+/* Returns a vector of all currently active triggers (triggers the player has entered) */
+std::vector<BoundingBox*> LevelZoneGrid::GetActiveTriggers(Camera* _player)
+{
+	std::vector<BoundingBox*> activeTriggers = std::vector<BoundingBox*>();
+	for (int i = 0; i < levelTriggers.size(); i++) {
+		if (levelTriggers[i]->ContainsPoint(_player->GetPosition())) activeTriggers.push_back(levelTriggers[i]);
+	}
+	return activeTriggers;
+}
+
+/* For debugging, load all NPCs at their highest LOD */
+void LevelZoneGrid::ForceLoadNPCS()
+{
+	bool didLoad = false;
+	for (int i = 0; i < levelNPCs.size(); i++) {
+		for (int x = 0; x < levelModels.size(); x++) {
+			if (levelModels[x].modelName == levelNPCs[i]->GetModelName()) {
+				Debug::Log("Loading NPC, with model " + levelModels[x].modelName);
+				levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD1, LevelOfDetail::HIGH));
+				levelNPCs[i]->CreateModel();
+				didLoad = true;
+				break;
+			}
+		}
+		if (!didLoad) {
+			Debug::Log("ERROR! Tried to load NPC with model " + levelNPCs[i]->GetModelName() + ", but it wasn't found!");
+		}
+		didLoad = false;
+	}
 }
 
 /* Requested load of model: check our existing loaded data, and if not already loaded, load it */

@@ -5,6 +5,8 @@
 class SharedModelBuffers;
 class LevelZoneTile;
 class NPC;
+class BoundingBox;
+class Camera;
 
 /* A struct for returning refs to neighbours of a zone tile */
 struct LevelZoneTileNeighbours {
@@ -28,17 +30,7 @@ public:
 	LevelZoneGrid(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd) {
 		Resize(_bl, _tr, _sd);
 	}
-	~LevelZoneGrid() {
-		for (int i = 0; i < levelTiles.size(); i++) {
-			delete levelTiles[i];
-		}
-		levelTiles.clear();
-		for (int i = 0; i < loadedModels.size(); i++) {
-			delete loadedModels[i];
-		}
-		loadedModels.clear();
-		levelModels.clear();
-	}
+	~LevelZoneGrid();
 
 	void Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd);
 
@@ -47,6 +39,9 @@ public:
 	}
 	void AddNPC(NPC* _npc) {
 		levelNPCs.push_back(_npc);
+	}
+	void AddTrigger(BoundingBox* _trigger) {
+		levelTriggers.push_back(_trigger);
 	}
 
 	LevelZoneTile* GetTileAtPosition(DirectX::XMFLOAT2 _p);
@@ -57,6 +52,9 @@ public:
 	}
 
 	void TrackLoading();
+	std::vector<BoundingBox*> GetActiveTriggers(Camera* _player);
+
+	void ForceLoadNPCS();
 
 private:
 	SharedModelBuffers* LoadModelToLevel(std::string model_path, LevelOfDetail lod);
@@ -72,4 +70,5 @@ private:
 	std::vector<ModelDef> levelModels = std::vector<ModelDef>();                        //Definitions of paths to model LODs
 	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>(); //Loaded model buffers
 	std::vector<NPC*> levelNPCs = std::vector<NPC*>();                                  //All NPCs in the level
+	std::vector<BoundingBox*> levelTriggers = std::vector<BoundingBox*>();              //All triggers in the level
 };
