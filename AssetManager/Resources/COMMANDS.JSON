@@ -1,0 +1,25 @@
+{
+    "BOUNDS": {
+        "BOTTOM_LEFT": [
+            0.0,
+            0.0
+        ],
+        "TOP_RIGHT": [
+            0.0,
+            0.0
+        ]
+    },
+    "PLAYER_SPAWN": {
+        "POSITION": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "ROTATION": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    },
+    "SUBDIVISION": 4
+}
