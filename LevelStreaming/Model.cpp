@@ -12,7 +12,7 @@ void Model::Create()
 void Model::Release()
 {
 	GameObject::Release();
-	modelData->RemoveUseage();
+	if (modelData) modelData->RemoveUseage();
 }
 
 /* Render all model parts */
