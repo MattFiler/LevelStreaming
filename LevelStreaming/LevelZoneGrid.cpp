@@ -145,10 +145,45 @@ void LevelZoneGrid::TrackLoading()
 	}
 
 #ifndef _DEBUG
-	//Show/hide NPCs depending on the active-ness of the tile they're in
+	//Load/unload NPCs depending on the active-ness of the tile they're in
 	for (int i = 0; i < levelNPCs.size(); i++) {
 		LevelZoneTile* tile = GetTileAtPosition(DirectX::XMFLOAT2(levelNPCs[i]->GetPosition().x, levelNPCs[i]->GetPosition().z));
-		levelNPCs[i]->SetInvisible(tile == nullptr || !tile->IsTileLoaded());
+
+		//Unload model if it doesn't match the current zone LOD
+		if (tile != nullptr && levelNPCs[i]->GetLOD() != LevelOfDetail::UNLOADED && levelNPCs[i]->GetLOD() != tile->GetLOD()) {
+			levelNPCs[i]->ReleaseModel();
+			Debug::Log("Unloading NPC: " + levelNPCs[i]->GetName());
+		}
+
+		//Unload model if it's outside of the active tiles
+		if (tile == nullptr || !tile->IsTileLoaded()) {
+			if (levelNPCs[i]->GetLOD() != LevelOfDetail::UNLOADED) {
+				levelNPCs[i]->ReleaseModel();
+				Debug::Log("Unloading NPC: " + levelNPCs[i]->GetName());
+			}
+		}
+
+		//Load model if it's in an active tile and not already at the correct LOD
+		else
+		{
+			if (levelNPCs[i]->GetLOD() == LevelOfDetail::UNLOADED) {
+				for (int x = 0; x < levelModels.size(); x++) {
+					if (levelModels[x].modelName == levelNPCs[i]->GetModelName()) {
+						Debug::Log("Loading NPC, with model " + levelModels[x].modelName + ", at LOD " + std::to_string((int)tile->GetLOD()) + ".");
+						switch (tile->GetLOD()) {
+							case LevelOfDetail::HIGH:
+								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD1, tile->GetLOD()));
+								break;
+							case LevelOfDetail::LOW:
+								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD2, tile->GetLOD()));
+								break;
+						}
+						levelNPCs[i]->CreateModel();
+						break;
+					}
+				}
+			}
+		}
 	}
 #endif
 
@@ -178,6 +213,7 @@ std::vector<Trigger*> LevelZoneGrid::GetActiveTriggers(Camera* _player)
 /* For debugging, load all NPCs at their highest LOD */
 void LevelZoneGrid::ForceLoadNPCS()
 {
+	return;
 	bool didLoad = false;
 	for (int i = 0; i < levelNPCs.size(); i++) {
 		for (int x = 0; x < levelModels.size(); x++) {

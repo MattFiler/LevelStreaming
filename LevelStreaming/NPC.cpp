@@ -1,17 +1,29 @@
 #include "NPC.h"
 #include "Waypoint.h"
 
+/* Create base resources */
+void NPC::Create()
+{
+	GameObject::Create();
+}
+
 /* A wrapper for model creation, to be called when swapping model data and LODs */
 void NPC::CreateModel()
 {
-	Model::Create();
-	isActive = true;
+	if (!modelData) Debug::Log("Creating an NPC without its model data - check scripts!");
+	if (modelData) modelData->AddUseage();
+}
+
+/* A wrapper for model deletion, to be called when swapping model data and LODs */
+void NPC::ReleaseModel()
+{
+	if (modelData) modelData->RemoveUseage();
+	modelData = nullptr;
 }
 
 /* Move the NPC if it's active */
 void NPC::Update(float dt)
 {
-	if (GetLOD() == LevelOfDetail::UNLOADED) return;
 	Model::Update(dt);
 
 	if (dxshared::pauseNPCs && pathingPoints.size() != 0) {

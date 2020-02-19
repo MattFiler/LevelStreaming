@@ -10,14 +10,14 @@ class NPC : public Model {
 public:
 	friend class EditorScene;
 
-	NPC() {
-		isActive = false;
-	}
 	~NPC() {
 		Release();
 	}
 
+	void Create() override;
 	void CreateModel();
+	void ReleaseModel();
+
 	void Update(float dt) override;
 	void Render(float dt) override;
 

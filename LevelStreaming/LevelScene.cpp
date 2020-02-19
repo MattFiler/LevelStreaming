@@ -142,7 +142,14 @@ bool LevelScene::Update(double dt)
 
 	ImGui::End();
 
-	if (level_grid) level_grid->TrackLoading();
+	if (level_grid) {
+		level_grid->TrackLoading();
+		std::vector<Trigger*> hitTriggers = level_grid->GetActiveTriggers(&main_cam);
+		for (int i = 0; i < hitTriggers.size(); i++) {
+			Debug::Log("Currently hitting trigger at (X:" + std::to_string(hitTriggers[i]->GetPosition().x) + ",Y:" + std::to_string(hitTriggers[i]->GetPosition().y) + ",Z:" + std::to_string(hitTriggers[i]->GetPosition().z) + ")!");
+			//TODO: act some logic on trigger
+		}
+	}
 
 	main_cam.SetLocked(camLock);
 	GameObjectManager::Update(dt);
