@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BoundingBox.h"
+#include "DebugCube.h"
 
-class Waypoint : public BoundingBox {
+class Waypoint : public DebugCube {
 public:
 	~Waypoint() {
 		Release();

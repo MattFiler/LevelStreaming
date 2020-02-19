@@ -104,6 +104,7 @@ void LevelScene::Init()
 void LevelScene::Release()
 {
 	if (level_grid) delete level_grid;
+	level_grid = nullptr;
 	GameObjectManager::Release();
 }
 
@@ -122,7 +123,7 @@ bool LevelScene::Update(double dt)
 	ImGui::Checkbox("Lock Cam", &camLock);
 #ifdef _DEBUG
 	ImGui::SameLine();
-	ImGui::Checkbox("Show Triggers", &dxshared::drawBoundingBoxes);
+	ImGui::Checkbox("Show Markers", &dxshared::drawBoundingBoxes);
 	ImGui::SameLine();
 	ImGui::Checkbox("Stop NPCs", &dxshared::pauseNPCs);
 #endif
@@ -146,7 +147,8 @@ bool LevelScene::Update(double dt)
 	main_cam.SetLocked(camLock);
 	GameObjectManager::Update(dt);
 
-	if (!in_editor_mode && level_grid) {
+#ifndef _DEBUG
+	if (level_grid) {
 		//Get the tile the camera (player) is currently within
 		LevelZoneTile* activeTile = level_grid->GetTileAtPosition(DirectX::XMFLOAT2(main_cam.GetPosition().x, main_cam.GetPosition().z));
 		std::vector<LevelZoneTile*> loadedTiles = std::vector<LevelZoneTile*>();
@@ -173,6 +175,7 @@ bool LevelScene::Update(double dt)
 			level_grid->GetAllTiles()[i]->UnloadTile(); //Unload everything if loaded
 		}
 	}
+#endif
 
 	return true;
 }

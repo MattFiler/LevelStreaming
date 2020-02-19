@@ -4,8 +4,12 @@
 #include "LevelZoneGrid.h"
 #include "LevelZoneTile.h"
 
+class Waypoint;
+
 class NPC : public Model {
 public:
+	friend class EditorScene;
+
 	NPC() {
 		isActive = false;
 	}
@@ -34,10 +38,10 @@ public:
 		return pathingPoints;
 	}
 
-	void SetPathingSpeed(float _speed) {
+	void SetPathingSpeed(int _speed) {
 		pathingSpeed = _speed;
 	}
-	float GetPathingSpeed() {
+	int GetPathingSpeed() {
 		return pathingSpeed;
 	}
 
@@ -53,6 +57,6 @@ private:
 	std::string modelName = "";
 
 	std::vector<DirectX::XMFLOAT3> pathingPoints = std::vector<DirectX::XMFLOAT3>();
-	float pathingSpeed = 1.0f;
+	int pathingSpeed = 1;
 	int currentPathingPointTarget = 0;
 };

@@ -144,11 +144,13 @@ void LevelZoneGrid::TrackLoading()
 		if (levelTiles[i]->IsTileLoading()) noneAreLoading = false;
 	}
 
+#ifndef _DEBUG
 	//Show/hide NPCs depending on the active-ness of the tile they're in
 	for (int i = 0; i < levelNPCs.size(); i++) {
 		LevelZoneTile* tile = GetTileAtPosition(DirectX::XMFLOAT2(levelNPCs[i]->GetPosition().x, levelNPCs[i]->GetPosition().z));
 		levelNPCs[i]->SetInvisible(tile == nullptr || !tile->IsTileLoaded());
 	}
+#endif
 
 	if (!noneAreLoading) return;
 	//Check to see if any model buffers aren't in use anymore - delete them if so

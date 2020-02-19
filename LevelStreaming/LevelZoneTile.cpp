@@ -64,6 +64,7 @@ void LevelZoneTile::TrackLoading()
 /* Load the contents of this zone tile */
 void LevelZoneTile::LoadTileThread(LevelOfDetail _lod)
 {
+	mutex.lock();
 	loadedModelsQueue.clear();
 	for (int i = 0; i < models.size(); i++)
 	{
@@ -90,7 +91,6 @@ void LevelZoneTile::LoadTileThread(LevelOfDetail _lod)
 			}
 		}
 	}
-	mutex.lock();
 	isLoading = false;
 	isLoaded = true;
 	mutex.unlock();

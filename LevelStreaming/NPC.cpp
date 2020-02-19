@@ -1,4 +1,5 @@
 #include "NPC.h"
+#include "Waypoint.h"
 
 /* A wrapper for model creation, to be called when swapping model data and LODs */
 void NPC::CreateModel()
@@ -15,7 +16,6 @@ void NPC::Update(float dt)
 
 	if (dxshared::pauseNPCs && pathingPoints.size() != 0) {
 		currentPathingPointTarget = 0;
-		position = pathingPoints[0];
 	}
 
 	if (!isActive) return;
