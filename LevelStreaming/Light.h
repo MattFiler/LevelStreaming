@@ -9,19 +9,6 @@ public:
 		Release();
 	}
 
-	void Create() override {
-		GameObject::Create();
-	}
-	void Release() override {
-		GameObject::Release();
-	}
-	void Update(float dt) override {
-		GameObject::Update(dt);
-	}
-	void Render(float dt) override {
-		GameObject::Render(dt);
-	}
-
 	void SetColour(XMFLOAT4 _colour) {
 		lightColour = _colour;
 	}

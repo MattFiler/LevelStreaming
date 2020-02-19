@@ -2,11 +2,12 @@
 
 #include "dxutils.h"
 
-#include "Cube.h"
 #include "Model.h"
 #include "Camera.h"
 #include "Light.h"
-#include "BoundingBox.h"
+#include "Waypoint.h"
+#include "Spawnpoint.h"
+#include "Trigger.h"
 #include "NPC.h"
 
 #include "nlohmann/json.hpp"

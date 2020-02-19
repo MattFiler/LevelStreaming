@@ -9,12 +9,7 @@ public:
 		Release();
 	}
 
-	void Create() override;
-	void Release() override;
 	void Update(float dt) override;
-	void Render(float dt) override {
-		//GameObject::Render(dt);
-	}
 
 	void SetLocked(bool locked) {
 		isLocked = locked;

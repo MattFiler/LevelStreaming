@@ -1,17 +1,10 @@
 #include "NPC.h"
 
-void NPC::Create() { }
-
 /* A wrapper for model creation, to be called when swapping model data and LODs */
 void NPC::CreateModel()
 {
 	Model::Create();
 	isActive = true;
-}
-
-void NPC::Release()
-{
-	Model::Release();
 }
 
 /* Move the NPC if it's active */
@@ -20,8 +13,14 @@ void NPC::Update(float dt)
 	if (GetLOD() == LevelOfDetail::UNLOADED) return;
 	Model::Update(dt);
 
+	if (dxshared::pauseNPCs && pathingPoints.size() != 0) {
+		currentPathingPointTarget = 0;
+		position = pathingPoints[0];
+	}
+
 	if (!isActive) return;
-	if (dt == 0 || pathingPoints.size() == 0 || dxshared::pauseNPCs) return;
+	if (dxshared::pauseNPCs || dt == 0 || pathingPoints.size() == 0) return;
+
 	float tx = pathingPoints[currentPathingPointTarget].x - position.x;
 	float ty = pathingPoints[currentPathingPointTarget].y - position.y;
 	float tz = pathingPoints[currentPathingPointTarget].z - position.z;

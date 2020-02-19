@@ -2,7 +2,7 @@
 #include "SharedModelBuffers.h"
 #include "LevelZoneTile.h"
 #include "NPC.h"
-#include "BoundingBox.h"
+#include "Trigger.h"
 #include "Camera.h"
 
 LevelZoneGrid::~LevelZoneGrid()
@@ -146,7 +146,8 @@ void LevelZoneGrid::TrackLoading()
 
 	//Show/hide NPCs depending on the active-ness of the tile they're in
 	for (int i = 0; i < levelNPCs.size(); i++) {
-		//levelNPCs[i]->SetInvisible(GetTileAtPosition(DirectX::XMFLOAT2(levelNPCs[i]->GetPosition().x, levelNPCs[i]->GetPosition().y))->IsTileLoadedOrLoading());
+		LevelZoneTile* tile = GetTileAtPosition(DirectX::XMFLOAT2(levelNPCs[i]->GetPosition().x, levelNPCs[i]->GetPosition().z));
+		levelNPCs[i]->SetInvisible(tile == nullptr || !tile->IsTileLoaded());
 	}
 
 	if (!noneAreLoading) return;
@@ -163,9 +164,9 @@ void LevelZoneGrid::TrackLoading()
 }
 
 /* Returns a vector of all currently active triggers (triggers the player has entered) */
-std::vector<BoundingBox*> LevelZoneGrid::GetActiveTriggers(Camera* _player)
+std::vector<Trigger*> LevelZoneGrid::GetActiveTriggers(Camera* _player)
 {
-	std::vector<BoundingBox*> activeTriggers = std::vector<BoundingBox*>();
+	std::vector<Trigger*> activeTriggers = std::vector<Trigger*>();
 	for (int i = 0; i < levelTriggers.size(); i++) {
 		if (levelTriggers[i]->ContainsPoint(_player->GetPosition())) activeTriggers.push_back(levelTriggers[i]);
 	}

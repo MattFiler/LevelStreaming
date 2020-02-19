@@ -22,8 +22,8 @@
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="BoundingBox2D.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
+    <ClCompile Include="DebugCube.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="dxmain.cpp" />
     <ClCompile Include="dxshared.cpp" />
@@ -50,14 +50,17 @@
     <ClCompile Include="LevelScene.cpp" />
     <ClCompile Include="SharedModelBuffers.cpp" />
     <ClCompile Include="SharedModelPart.cpp" />
+    <ClCompile Include="Spawnpoint.cpp" />
+    <ClCompile Include="Trigger.cpp" />
+    <ClCompile Include="Waypoint.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="BoundingBox2D.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Cube.h" />
     <ClInclude Include="DDSTextureLoader.h" />
+    <ClInclude Include="DebugCube.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="dxmain.h" />
     <ClInclude Include="dxshared.h" />
@@ -88,8 +91,11 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SharedModelBuffers.h" />
     <ClInclude Include="SharedModelPart.h" />
+    <ClInclude Include="Spawnpoint.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="LevelScene.h" />
+    <ClInclude Include="Trigger.h" />
+    <ClInclude Include="Waypoint.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

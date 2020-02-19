@@ -62,7 +62,7 @@ void LevelScene::Init()
 		//Load all trigger placements to the whole grid
 		for (int i = 0; i < commands_json["TRIGGERS"].size(); i++) {
 			json this_placement_json = commands_json["TRIGGERS"][i];
-			BoundingBox* new_trigger = new BoundingBox();
+			Trigger* new_trigger = new Trigger();
 			new_trigger->SetDims(
 				DirectX::XMFLOAT3(this_placement_json["BOTTOM_LEFT"][0], this_placement_json["BOTTOM_LEFT"][1], this_placement_json["BOTTOM_LEFT"][2]),
 				DirectX::XMFLOAT3(this_placement_json["TOP_RIGHT"][0], this_placement_json["TOP_RIGHT"][1], this_placement_json["TOP_RIGHT"][2])

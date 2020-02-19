@@ -13,9 +13,7 @@ public:
 		Release();
 	}
 
-	void Create() override;
 	void CreateModel();
-	void Release() override;
 	void Update(float dt) override;
 	void Render(float dt) override;
 

@@ -13,7 +13,11 @@ DirectX::XMMATRIX dxshared::mProjection;
 DirectX::XMFLOAT4 dxshared::ambientLightColour;
 
 bool dxshared::drawBoundingBoxes = false;
+#if _DEBUG
+bool dxshared::pauseNPCs = true;
+#else
 bool dxshared::pauseNPCs = false;
+#endif
 
 ImGuizmo::OPERATION dxshared::mCurrentGizmoOperation = ImGuizmo::ROTATE;
 ImGuizmo::MODE dxshared::mCurrentGizmoMode = ImGuizmo::WORLD;

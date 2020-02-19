@@ -5,8 +5,8 @@
 class SharedModelBuffers;
 class LevelZoneTile;
 class NPC;
-class BoundingBox;
 class Camera;
+class Trigger;
 
 /* A struct for returning refs to neighbours of a zone tile */
 struct LevelZoneTileNeighbours {
@@ -40,7 +40,7 @@ public:
 	void AddNPC(NPC* _npc) {
 		levelNPCs.push_back(_npc);
 	}
-	void AddTrigger(BoundingBox* _trigger) {
+	void AddTrigger(Trigger* _trigger) {
 		levelTriggers.push_back(_trigger);
 	}
 
@@ -52,7 +52,7 @@ public:
 	}
 
 	void TrackLoading();
-	std::vector<BoundingBox*> GetActiveTriggers(Camera* _player);
+	std::vector<Trigger*> GetActiveTriggers(Camera* _player);
 
 	void ForceLoadNPCS();
 
@@ -70,5 +70,5 @@ private:
 	std::vector<ModelDef> levelModels = std::vector<ModelDef>();                        //Definitions of paths to model LODs
 	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>(); //Loaded model buffers
 	std::vector<NPC*> levelNPCs = std::vector<NPC*>();                                  //All NPCs in the level
-	std::vector<BoundingBox*> levelTriggers = std::vector<BoundingBox*>();              //All triggers in the level
+	std::vector<Trigger*> levelTriggers = std::vector<Trigger*>();                      //All triggers in the level
 };

@@ -1,6 +1,6 @@
 #include "Model.h"
 
-/* Create all model parts */
+/* Add useage to model data */
 void Model::Create()
 {
 	GameObject::Create();
@@ -8,17 +8,11 @@ void Model::Create()
 	modelData->AddUseage();
 }
 
-/* Release all model parts */
+/* Remove useage from model data */
 void Model::Release()
 {
 	GameObject::Release();
 	modelData->RemoveUseage();
-}
-
-/* Update all model parts */
-void Model::Update(float dt)
-{
-	GameObject::Update(dt);
 }
 
 /* Render all model parts */

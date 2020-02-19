@@ -12,7 +12,6 @@ public:
 
 	void Create() override;
 	void Release() override;
-	void Update(float dt) override;
 	void Render(float dt) override;
 
 	void SetData(SharedModelBuffers* _m) {

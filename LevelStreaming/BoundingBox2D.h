@@ -8,6 +8,8 @@ public:
 		Release();
 	}
 
+	void Create() override;
+
 	//Remember when calling GetDims() that Y doesn't count!
 	bool ContainsPoint(DirectX::XMFLOAT3 _p);
 

@@ -93,9 +93,6 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="Cube.cpp">
-      <Filter>Source Files\GameObjects</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
@@ -136,6 +133,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NPC.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugCube.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Trigger.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Spawnpoint.cpp">
+      <Filter>Source Files\GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="Waypoint.cpp">
       <Filter>Source Files\GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -194,9 +203,6 @@
     <ClInclude Include="GameObjectManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Cube.h">
-      <Filter>Header Files\GameObjects</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
@@ -249,6 +255,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NPC.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugCube.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Trigger.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Spawnpoint.h">
+      <Filter>Header Files\GameObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Waypoint.h">
       <Filter>Header Files\GameObjects</Filter>
     </ClInclude>
   </ItemGroup>
