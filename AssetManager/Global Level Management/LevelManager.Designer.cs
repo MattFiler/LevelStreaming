@@ -32,6 +32,7 @@
             this.manageLevel = new System.Windows.Forms.Button();
             this.deleteLevel = new System.Windows.Forms.Button();
             this.levelList = new System.Windows.Forms.ListBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // addLevel
@@ -72,11 +73,21 @@
             this.levelList.Size = new System.Drawing.Size(478, 238);
             this.levelList.TabIndex = 3;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(544, 33);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(74, 34);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "TEST";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
             // LevelManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(661, 254);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.levelList);
             this.Controls.Add(this.deleteLevel);
             this.Controls.Add(this.manageLevel);
@@ -95,6 +106,7 @@
         private System.Windows.Forms.Button manageLevel;
         private System.Windows.Forms.Button deleteLevel;
         private System.Windows.Forms.ListBox levelList;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -52,30 +52,39 @@ namespace AssetManager
         public float y = 0.0f;
     }
 
-    /* A face, made up of vertices, each with a material name */
+    /* Model classes, ported from my C++ code */
     class Face
     {
-        public List<Vertex> verts = new List<Vertex>();
+        public List<VertexGroup> verts = new List<VertexGroup>();
         public string materialName = "";
     }
-
-    /* A vertex */
-    class Vertex
+    class SimpleVertex
+    {
+        public Vector3 Pos = new Vector3();
+        public Vector2 Tex = new Vector2();
+        public Vector3 Normal = new Vector3();
+    }
+    class VertexGroup
     {
         public int v = 0;
         public int c = 0;
         public int n = 0;
         public bool set = false;
     }
-
-    /* A material */
-    class Material
+    class ModelMaterialData
     {
         public string materialName = "";
+        public int textureID = -1;
         public string texturePath = "";
         public Colour colourTint = new Colour();
     }
-    
+    class ModelPart
+    {
+        public List<SimpleVertex> compVertices = new List<SimpleVertex>();
+        public List<int> compIndices = new List<int>();
+        public ModelMaterialData thisMaterial = new ModelMaterialData();
+    }
+
     /* OBJ reader state */
     enum VertReaderType
     {
@@ -84,22 +93,31 @@ namespace AssetManager
         NORMAL,
     };
 
-    /* A part of a model with its associated material data */
-    class ModelPart
+    /* LOD version */
+    enum LevelOfDetail
     {
-        //Geometry
-        public List<Face> modelFaces = new List<Face>();
-
-        //Material
+        HIGH,
+        LOW
     }
 
     /* A model, made up of parts with materials */
     class Model
     {
+        public string modelName = ""; //TODO: Some kind of unique ID system for models
         public List<ModelPart> modelParts = new List<ModelPart>();
-
-        public LoadOBJ(string path)
+        public LevelOfDetail modelLOD;
+        private bool loadedFromObj = false; 
+        public bool FromOBJ { get { return loadedFromObj; } } //If false, we won't have a texturePath for ModelMaterialData objects
+        public Model(LevelOfDetail _lod)
         {
+            modelLOD = _lod;
+        }
+
+        public void LoadFromOBJ(string path)
+        {
+            modelName = Path.GetFileNameWithoutExtension(path);
+            loadedFromObj = true;
+
             //Parse the OBJ to vertices/texcoords/normals
             List<string> objFile = File.ReadAllLines(path).ToList();
             List<Vector3> verts = new List<Vector3>();
@@ -124,7 +142,7 @@ namespace AssetManager
                         int vertPosIndex = 0;
                         for (int i = 0; i < _str.Length + 1; i++)
                         {
-                            if (_str[i] == ' ' || i == _str.Length)
+                            if (i == _str.Length || _str[i] == ' ')
                             {
                                 if (thisPos == "") continue;
                                 if (vertPosIndex == 0) thisVertPos.x = Convert.ToSingle(thisPos);
@@ -146,7 +164,7 @@ namespace AssetManager
                         int texCoordIndex = 0;
                         for (int i = 0; i < _str.Length + 1; i++)
                         {
-                            if (_str[i] == ' ' || i == _str.Length)
+                            if (i == _str.Length || _str[i] == ' ')
                             {
                                 if (thisPos == "") continue;
                                 if (texCoordIndex == 0) thisTexCoord.x = Convert.ToSingle(thisPos);
@@ -167,7 +185,7 @@ namespace AssetManager
                         int normalIndex = 0;
                         for (int i = 0; i < _str.Length + 1; i++)
                         {
-                            if (_str[i] == ' ' || i == _str.Length)
+                            if (i == _str.Length || _str[i] == ' ')
                             {
                                 if (thisPos == "") continue;
                                 if (normalIndex == 0) thisNormal.x = Convert.ToSingle(thisPos);
@@ -189,13 +207,12 @@ namespace AssetManager
                     {
                         string _str = str.Substring(2);
                         Face thisFace = new Face();
-                        Vertex thisVert = new Vertex();
+                        VertexGroup thisVert = new VertexGroup();
                         VertReaderType next = VertReaderType.VERTEX;
                         string currentNumber = "";
                         for (int i = 0; i < _str.Length + 1; i++)
                         {
-                            char thisChar = _str[i];
-                            if (thisChar == '/' || thisChar == ' ' || i == _str.Length)
+                            if (i == _str.Length || _str[i] == '/' || _str[i] == ' ')
                             {
                                 if (currentNumber == "")
                                 {
@@ -222,13 +239,13 @@ namespace AssetManager
                                 thisVert.set = true;
                                 currentNumber = "";
 
-                                if (thisChar == '/') continue;
+                                if (i < _str.Length && _str[i] == '/') continue;
                                 if (!thisVert.set) continue;
                                 thisFace.verts.Add(thisVert);
-                                thisVert = new Vertex();
+                                thisVert = new VertexGroup();
                                 continue;
                             }
-                            currentNumber += thisChar;
+                            currentNumber += _str[i];
                         }
                         //if (thisFace.verts.Count != 3) Debug::Log("This model is not triangulated!");
                         thisFace.materialName = thisMaterial;
@@ -238,7 +255,7 @@ namespace AssetManager
             }
 
             //Open and parse MTL if it exists
-            List<Material> materials = new List<Material>();
+            List<ModelMaterialData> materials = new List<ModelMaterialData>();
             if (materialLibrary != "")
             {
                 //Get model path parts
@@ -297,7 +314,7 @@ namespace AssetManager
                 List<string> mtlFile = File.ReadAllLines(pathToMtl).ToList();
 
                 //Parse MTL into materials
-                Material currentMaterial = new Material();
+                ModelMaterialData currentMaterial = new ModelMaterialData();
                 foreach (string str in mtlFile)
                 {
                     if (str.Length > 0)
@@ -307,7 +324,7 @@ namespace AssetManager
                             if (currentMaterial.materialName != "")
                             {
                                 materials.Add(currentMaterial);
-                                currentMaterial = new Material();
+                                currentMaterial = new ModelMaterialData();
                             }
                             currentMaterial.materialName = str.Substring(7);
                         }
@@ -318,7 +335,7 @@ namespace AssetManager
                             int thisColourIndex = 0;
                             for (int i = 0; i < _str.Length + 1; i++)
                             {
-                                if (_str[i] == ' ' || i == _str.Length)
+                                if (i == _str.Length || _str[i] == ' ')
                                 {
                                     if (thisColour == "") continue;
                                     if (thisColourIndex == 0) currentMaterial.colourTint.r = Convert.ToSingle(thisColour);
@@ -345,7 +362,7 @@ namespace AssetManager
                             else
                             {
                                 string texPrepend = "";
-                                for (int i = pathToMtl.Length; i >= 0; i--)
+                                for (int i = pathToMtl.Length - 1; i >= 0; i--)
                                 {
                                     if (pathToMtl[i] == '/' || pathToMtl[i] == '\\')
                                     {
@@ -354,6 +371,15 @@ namespace AssetManager
                                     }
                                 }
                                 currentMaterial.texturePath = texPrepend + "/" + currentMaterial.texturePath;
+                            }
+                            if (File.Exists(currentMaterial.texturePath))
+                            {
+                                currentMaterial.textureID = TexturesFile.AddFile(new Texture(File.ReadAllBytes(currentMaterial.texturePath).ToList()));
+                            }
+                            else
+                            {
+                                //show error
+                                string dfg = "";
                             }
                         }
                     }
@@ -367,11 +393,11 @@ namespace AssetManager
             //Create vertex and index arrays from the data
             ModelPart modelPart = new ModelPart();
             int totalIndex = 0;
-            for (int i = 0; i < faces.size(); i++)
+            for (int i = 0; i < faces.Count; i++)
             {
-                for (int x = 0; x < faces[i].verts.size(); x++)
+                for (int x = 0; x < faces[i].verts.Count; x++)
                 {
-                    Vertex thisVertInfo = new Vertex();
+                    SimpleVertex thisVertInfo = new SimpleVertex();
                     thisVertInfo.Pos = verts[faces[i].verts[x].v - 1];
                     thisVertInfo.Tex = coords[faces[i].verts[x].c - 1];
                     thisVertInfo.Normal = normals[faces[i].verts[x].n - 1];
@@ -380,10 +406,10 @@ namespace AssetManager
                     {
                         if (totalIndex != 0)
                         {
-                            thisModel.modelParts.push_back(modelPart);
-                            modelPart = LoadedModelPart();
+                            modelParts.Add(modelPart);
+                            modelPart = new ModelPart();
                         }
-                        for (int y = 0; y < materials.size(); y++)
+                        for (int y = 0; y < materials.Count; y++)
                         {
                             if (materials[y].materialName == faces[i].materialName)
                             {
@@ -393,14 +419,13 @@ namespace AssetManager
                         }
                     }
 
-                    modelPart.compVertices.push_back(thisVertInfo);
-                    modelPart.compIndices.push_back((WORD)totalIndex);
+                    modelPart.compVertices.Add(thisVertInfo);
+                    modelPart.compIndices.Add(totalIndex);
 
                     totalIndex++;
                 }
             }
-            thisModel.modelParts.push_back(modelPart);
-            return thisModel;
+            modelParts.Add(modelPart);
         }
     }
 }

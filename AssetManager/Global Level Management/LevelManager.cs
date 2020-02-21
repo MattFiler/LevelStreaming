@@ -17,6 +17,7 @@ namespace AssetManager
         public LevelManager()
         {
             InitializeComponent();
+            ReloadList();
         }
 
         /* Reload GUI List */
@@ -45,7 +46,9 @@ namespace AssetManager
         /* Manage assets for a selected existing level */
         private void manageLevel_Click(object sender, EventArgs e)
         {
-
+            AssetManager assetEditor = new AssetManager();
+            assetEditor.FormClosed += new FormClosedEventHandler(ReloadList);
+            assetEditor.Show();
         }
 
         /* Delete a selected level */

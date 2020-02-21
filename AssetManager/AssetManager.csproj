@@ -60,8 +60,16 @@
     <Compile Include="Global Level Management\LevelManager.Designer.cs">
       <DependentUpon>LevelManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="Per-Level Asset Management\AssetManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Per-Level Asset Management\AssetManager.Designer.cs">
+      <DependentUpon>AssetManager.cs</DependentUpon>
+    </Compile>
     <Compile Include="Per-Level Asset Management\Model.cs" />
     <Compile Include="Per-Level Asset Management\ModelsFile.cs" />
+    <Compile Include="Per-Level Asset Management\Texture.cs" />
+    <Compile Include="Per-Level Asset Management\TexturesFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Global Level Management\CreateLevel.resx">
@@ -69,6 +77,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Global Level Management\LevelManager.resx">
       <DependentUpon>LevelManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Per-Level Asset Management\AssetManager.resx">
+      <DependentUpon>AssetManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
