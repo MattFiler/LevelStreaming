@@ -36,14 +36,17 @@ namespace AssetManager
                 }
             }
 
-            string pathToEnv = "DATA/ENV/PRODUCTION/" + levelName.Text.Trim().ToUpper().Replace(' ', '_') + "/";
-            LevelFile.GetData().Add(new Level(levelName.Text, pathToEnv, (LevelType)levelType.SelectedIndex));
+            string pathToEnv = "ENV/PRODUCTION/" + levelName.Text.Trim().ToUpper().Replace(' ', '_') + "/";
+            LevelFile.GetData().Add(new Level(levelName.Text, "DATA/"+pathToEnv, (LevelType)levelType.SelectedIndex));
             LevelFile.SaveData();
 
             Directory.CreateDirectory(pathToEnv);
             File.WriteAllBytes(pathToEnv + "COMMANDS.BIN", Properties.Resources.COMMANDS_BIN);
             File.WriteAllBytes(pathToEnv + "COMMANDS.JSON", Properties.Resources.COMMANDS_JSON);
-            Directory.CreateDirectory(pathToEnv + "TEXTURES");
+            ModelsFile.GetFiles().Clear();
+            ModelsFile.Save(pathToEnv);
+            TexturesFile.GetFiles().Clear();
+            TexturesFile.Save(pathToEnv);
 
             MessageBox.Show("Saved!", "Complete.", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();

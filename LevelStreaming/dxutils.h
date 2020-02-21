@@ -118,6 +118,15 @@ struct LoadedModel
 	std::vector<LoadedModelPart> modelParts = std::vector<LoadedModelPart>();
 };
 
+struct BinModel {
+	LevelOfDetail modelLOD;
+	std::string modelName;
+	int pakOffset;
+	int pakLength;
+	int modelPartCount;
+	std::vector<int> vertCount = std::vector<int>();
+};
+
 struct Face
 {
 	std::vector<VertexGroup> verts = std::vector<VertexGroup>(); //Vertices (SHOULD BE 3 - TRIANGULATED)

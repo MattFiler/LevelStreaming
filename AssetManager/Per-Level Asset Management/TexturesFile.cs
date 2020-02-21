@@ -11,6 +11,8 @@ namespace AssetManager
     class TexturesFile
     {
         private static List<Texture> allFiles = new List<Texture>();
+        private static int CURRENT_VERSION = 1;
+        public static int Version { get { return CURRENT_VERSION; } }
 
         /* Add/remove textures from the in-memory archive */
         public static int AddFile(Texture _file)
@@ -66,12 +68,12 @@ namespace AssetManager
         }
 
         /* Load the texture archive */
-        public static void Load()
+        public static void Load(string level_path)
         {
             allFiles.Clear();
-            if (!File.Exists("LEVEL_TEXTURES.BIN")) return;
+            if (!File.Exists(level_path + "LEVEL_TEXTURES.BIN")) return;
 
-            BinaryReader reader = new BinaryReader(File.OpenRead("LEVEL_TEXTURES.BIN"));
+            BinaryReader reader = new BinaryReader(File.OpenRead(level_path + "LEVEL_TEXTURES.BIN"));
             int fileVersion = reader.ReadInt32();
             int entryCount = reader.ReadInt32();
             for (int i = 0; i < entryCount; i++)
@@ -84,7 +86,7 @@ namespace AssetManager
             }
             reader.Close();
 
-            reader = new BinaryReader(File.OpenRead("LEVEL_TEXTURES.PAK"));
+            reader = new BinaryReader(File.OpenRead(level_path + "LEVEL_TEXTURES.PAK"));
             for (int i = 0; i < entryCount; i++)
             {
                 List<byte> texCont = new List<byte>();
@@ -98,9 +100,9 @@ namespace AssetManager
         }
 
         /* Save the texture archive */
-        public static void Save()
+        public static void Save(string level_path)
         {
-            BinaryWriter writer = new BinaryWriter(File.OpenWrite("LEVEL_TEXTURES.PAK"));
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(level_path + "LEVEL_TEXTURES.PAK"));
             writer.BaseStream.SetLength(0);
             List<int> fileOffsets = new List<int>();
             for (int i = 0; i < allFiles.Count; i++)
@@ -110,9 +112,9 @@ namespace AssetManager
             }
             writer.Close();
 
-            writer = new BinaryWriter(File.OpenWrite("LEVEL_TEXTURES.BIN"));
+            writer = new BinaryWriter(File.OpenWrite(level_path + "LEVEL_TEXTURES.BIN"));
             writer.BaseStream.SetLength(0);
-            writer.Write(1);
+            writer.Write(CURRENT_VERSION);
             writer.Write(allFiles.Count);
             for (int i = 0; i < allFiles.Count; i++)
             {

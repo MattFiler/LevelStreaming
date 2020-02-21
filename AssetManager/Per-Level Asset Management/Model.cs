@@ -103,19 +103,19 @@ namespace AssetManager
     /* A model, made up of parts with materials */
     class Model
     {
-        public string modelName = ""; //TODO: Some kind of unique ID system for models
+        public string modelName = "";
         public List<ModelPart> modelParts = new List<ModelPart>();
         public LevelOfDetail modelLOD;
         private bool loadedFromObj = false; 
         public bool FromOBJ { get { return loadedFromObj; } } //If false, we won't have a texturePath for ModelMaterialData objects
-        public Model(LevelOfDetail _lod)
+        public Model(string _name, LevelOfDetail _lod)
         {
             modelLOD = _lod;
+            modelName = _name;
         }
 
-        public void LoadFromOBJ(string path)
+        public bool LoadFromOBJ(string path)
         {
-            modelName = Path.GetFileNameWithoutExtension(path);
             loadedFromObj = true;
 
             //Parse the OBJ to vertices/texcoords/normals
@@ -216,9 +216,9 @@ namespace AssetManager
                             {
                                 if (currentNumber == "")
                                 {
-                                    //if (verts.Count == 0) Debug::Log("This model has no vertices!");
-                                    //if (coords.Count == 0) Debug::Log("This model has no UVs!");
-                                    //if (normals.Count == 0) Debug::Log("This model has no normals!");
+                                    if (verts.Count == 0) return false;
+                                    if (coords.Count == 0) return false;
+                                    if (normals.Count == 0) return false;
                                     continue;
                                 }
                                 switch (next)
@@ -247,7 +247,7 @@ namespace AssetManager
                             }
                             currentNumber += _str[i];
                         }
-                        //if (thisFace.verts.Count != 3) Debug::Log("This model is not triangulated!");
+                        if (thisFace.verts.Count != 3) return false;
                         thisFace.materialName = thisMaterial;
                         faces.Add(thisFace);
                     }
@@ -426,6 +426,7 @@ namespace AssetManager
                 }
             }
             modelParts.Add(modelPart);
+            return true;
         }
     }
 }

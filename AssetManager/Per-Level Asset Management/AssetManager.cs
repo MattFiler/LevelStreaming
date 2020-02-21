@@ -13,13 +13,25 @@ namespace AssetManager
 {
     public partial class AssetManager : Form
     {
-        public AssetManager()
+        private string levelPath;
+        public AssetManager(string level_path)
         {
+            levelPath = level_path;
+            if (levelPath.Substring(0, 5) == "DATA/")
+            {
+                levelPath = levelPath.Substring(5);
+            }
             InitializeComponent();
             ReloadList();
         }
 
         /* Reload GUI List */
+        private void SaveAndReloadList(object sender, EventArgs e)
+        {
+            ModelsFile.Save(levelPath);
+            TexturesFile.Save(levelPath);
+            ReloadList();
+        }
         private void ReloadList(object sender, EventArgs e)
         {
             ReloadList();
@@ -27,32 +39,35 @@ namespace AssetManager
         private void ReloadList()
         {
             modelList.Items.Clear();
-            ModelsFile.Load();
-            TexturesFile.Load();
+            ModelsFile.Load(levelPath);
+            TexturesFile.Load(levelPath);
             foreach (Model model in ModelsFile.GetFiles())
             {
-                modelList.Items.Add(model.modelName);
+                if (!modelList.Items.Contains(model.modelName)) modelList.Items.Add(model.modelName); //We share names between LOD0&1, so don't duplicate
             }
         }
 
+        /* Add a model to the level */
         private void addModel_Click(object sender, EventArgs e)
         {
-            OpenFileDialog modelSelect = new OpenFileDialog();
-            modelSelect.Filter = "OBJ Model File|*.obj";
-            if (modelSelect.ShowDialog() != DialogResult.OK) return;
-            Model newModel = new Model(LevelOfDetail.HIGH);
-            newModel.LoadFromOBJ(modelSelect.FileName);
-            ModelsFile.AddFile(newModel);
-            TexturesFile.AddFilesFromModel(newModel);
-            ModelsFile.Save();
-            TexturesFile.Save();
-            ReloadList();
+            ModelImporter modelImporter = new ModelImporter();
+            modelImporter.FormClosed += new FormClosedEventHandler(SaveAndReloadList);
+            modelImporter.Show();
         }
 
+        /* Delete a model from the level */
         private void deleteModel_Click(object sender, EventArgs e)
         {
             if (modelList.SelectedIndex == -1) return;
-            ModelsFile.RemoveFile(ModelsFile.GetFiles()[modelList.SelectedIndex]);
+            
+            for (int i = 0; i < ModelsFile.GetFiles().Count; i++)
+            {
+                if (ModelsFile.GetFiles()[i].modelName == modelList.Items[modelList.SelectedIndex].ToString())
+                {
+                    ModelsFile.RemoveFile(ModelsFile.GetFiles()[i]);
+                }
+            }
+
             Texture[] prevTexs = new Texture[TexturesFile.GetFiles().Count];
             TexturesFile.GetFiles().CopyTo(prevTexs);
             TexturesFile.GetFiles().Clear();
@@ -69,8 +84,10 @@ namespace AssetManager
                     }
                 }
             }
-            ModelsFile.Save();
-            TexturesFile.Save();
+
+            ModelsFile.Save(levelPath);
+            TexturesFile.Save(levelPath);
+
             ReloadList();
         }
     }

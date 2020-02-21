@@ -84,6 +84,7 @@
     <ClInclude Include="LevelZoneGrid.h" />
     <ClInclude Include="LevelZoneTile.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="NPC.h" />

@@ -12,16 +12,38 @@ bool SceneManager::Init()
 {
 	bool dxInit = dxmain::Init();
 
-	//Parse levels JSON & load all into LevelScene
-	std::fstream lvl_js("DATA\\LEVELS.JSON");
-	lvl_js >> levels_json;
-	for (int i = 0; i < levels_json["LEVELS"].size(); i++)
+	//Parse levels data & load all into LevelScene
+	std::ifstream fin("DATA\\LEVELS.BIN", std::ios::in | std::ios::binary);
+	int file_version;
+	fin.read((char*)&file_version, 4);
+	int entry_count;
+	fin.read((char*)&entry_count, 4);
+	for (int i = 0; i < entry_count; i++)
 	{
-		LevelType level_type = (levels_json["LEVELS"][i]["TYPE"] == "FE_LEVEL")?LevelType::FE_LEVEL:LevelType::STD_LEVEL;
-		LevelScene* level_scene = new EditorScene(levels_json["LEVELS"][i]["NAME"], levels_json["LEVELS"][i]["PATH"], level_type);
+		INT8 string_len;
+		fin.read((char*)&string_len, 1);
+		std::string level_name = "";
+		for (int x = 0; x < string_len; x++) {
+			char this_char;
+			fin.read((char*)&this_char, 1);
+			level_name += this_char;
+		}
+		fin.read((char*)&string_len, 1);
+		std::string level_path = "";
+		for (int x = 0; x < string_len; x++) {
+			char this_char;
+			fin.read((char*)&this_char, 1);
+			level_path += this_char;
+		}
+		INT16 level_type;
+		fin.read((char*)&level_type, 2);
+
+		LevelScene* level_scene = new EditorScene(level_name, level_path, (LevelType)level_type);
 		AddScene(level_scene);
+
 		if (level_type == LevelType::FE_LEVEL) ChangeScene(i);
 	}
+	fin.close();
 
 	return dxInit;
 }

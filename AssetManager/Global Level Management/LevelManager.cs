@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,8 +13,6 @@ namespace AssetManager
 {
     public partial class LevelManager : Form
     {
-        private List<Level> allLevels = new List<Level>();
-
         public LevelManager()
         {
             InitializeComponent();
@@ -46,7 +45,9 @@ namespace AssetManager
         /* Manage assets for a selected existing level */
         private void manageLevel_Click(object sender, EventArgs e)
         {
-            AssetManager assetEditor = new AssetManager();
+            if (levelList.SelectedIndex == -1) return;
+
+            AssetManager assetEditor = new AssetManager(LevelFile.GetData()[levelList.SelectedIndex].levelPath);
             assetEditor.FormClosed += new FormClosedEventHandler(ReloadList);
             assetEditor.Show();
         }
@@ -54,7 +55,16 @@ namespace AssetManager
         /* Delete a selected level */
         private void deleteLevel_Click(object sender, EventArgs e)
         {
+            if (levelList.SelectedIndex == -1) return;
+            DialogResult shouldDo = MessageBox.Show("Are you sure you wish to delete this level?", "Confirmation...", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (shouldDo != DialogResult.Yes) return;
 
+            Level toRemove = LevelFile.GetData()[levelList.SelectedIndex];
+            LevelFile.GetData().Remove(toRemove);
+            if (toRemove.levelPath.Substring(0, 5) == "DATA/") toRemove.levelPath = toRemove.levelPath.Substring(5);
+            Directory.Delete(toRemove.levelPath, true);
+
+            MessageBox.Show("Successfully deleted!", "Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

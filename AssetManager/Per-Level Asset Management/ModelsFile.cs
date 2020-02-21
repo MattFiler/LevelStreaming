@@ -11,6 +11,8 @@ namespace AssetManager
     class ModelsFile
     {
         private static List<Model> allFiles = new List<Model>();
+        private static int CURRENT_VERSION = 1;
+        public static int Version { get { return CURRENT_VERSION; } }
 
         /* Add/remove models from the in-memory archive */
         public static void AddFile(Model _file)
@@ -29,19 +31,18 @@ namespace AssetManager
         }
 
         /* Load the model archive */
-        public static void Load()
+        public static void Load(string level_path)
         {
             allFiles.Clear();
-            if (!File.Exists("LEVEL_MODELS.BIN")) return;
+            if (!File.Exists(level_path + "LEVEL_MODELS.BIN")) return;
 
-            BinaryReader reader = new BinaryReader(File.OpenRead("LEVEL_MODELS.BIN"));
+            BinaryReader reader = new BinaryReader(File.OpenRead(level_path + "LEVEL_MODELS.BIN"));
             int fileVersion = reader.ReadInt32();
             int entryCount = reader.ReadInt32();
             List<int> vertCountComp = new List<int>();
             for (int i = 0; i < entryCount; i++)
             {
-                Model newModel = new Model((LevelOfDetail)reader.ReadInt16());
-                newModel.modelName = reader.ReadString();
+                Model newModel = new Model(reader.ReadString(), (LevelOfDetail)reader.ReadInt16());
                 reader.BaseStream.Position += 8; //We shouldn't need the offset/length here
                 int numModelParts = reader.ReadInt32();
                 for (int x = 0; x < numModelParts; x++)
@@ -60,7 +61,7 @@ namespace AssetManager
             }
             reader.Close();
 
-            reader = new BinaryReader(File.OpenRead("LEVEL_MODELS.PAK"));
+            reader = new BinaryReader(File.OpenRead(level_path + "LEVEL_MODELS.PAK"));
             for (int i = 0; i < entryCount; i++)
             {
                 for (int x = 0; x < allFiles[i].modelParts.Count; x++)
@@ -90,9 +91,9 @@ namespace AssetManager
         }
 
         /* Save the model archive */
-        public static void Save()
+        public static void Save(string level_path)
         {
-            BinaryWriter writer = new BinaryWriter(File.OpenWrite("LEVEL_MODELS.PAK"));
+            BinaryWriter writer = new BinaryWriter(File.OpenWrite(level_path + "LEVEL_MODELS.PAK"));
             writer.BaseStream.SetLength(0);
             List<int> fileOffsets = new List<int>();
             for (int i = 0; i < allFiles.Count; i++)
@@ -124,14 +125,14 @@ namespace AssetManager
             fileOffsets.Add((int)writer.BaseStream.Position);
             writer.Close();
 
-            writer = new BinaryWriter(File.OpenWrite("LEVEL_MODELS.BIN"));
+            writer = new BinaryWriter(File.OpenWrite(level_path + "LEVEL_MODELS.BIN"));
             writer.BaseStream.SetLength(0);
-            writer.Write(1);
+            writer.Write(CURRENT_VERSION);
             writer.Write(allFiles.Count);
             for (int i = 0; i < allFiles.Count; i++)
             {
-                writer.Write((Int16)allFiles[i].modelLOD);
                 writer.Write(allFiles[i].modelName);
+                writer.Write((Int16)allFiles[i].modelLOD);
                 writer.Write(fileOffsets[i]);
                 writer.Write(fileOffsets[i+1] - fileOffsets[i]);
                 writer.Write(allFiles[i].modelParts.Count);
