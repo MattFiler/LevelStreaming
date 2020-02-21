@@ -16,6 +16,7 @@ namespace AssetManager
         public CreateLevel()
         {
             InitializeComponent();
+            levelType.SelectedIndex = 1;
         }
 
         /* Save the new level */

@@ -30,7 +30,7 @@ namespace AssetManager
             LevelFile.LoadData();
             foreach (Level level in LevelFile.GetData())
             {
-                levelList.Items.Add(level);
+                levelList.Items.Add(level.levelName);
             }
         }
 

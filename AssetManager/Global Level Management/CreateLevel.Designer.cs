@@ -94,6 +94,7 @@
             this.Controls.Add(this.saveLevel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "CreateLevel";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Create Level";
             this.ResumeLayout(false);
             this.PerformLayout();
