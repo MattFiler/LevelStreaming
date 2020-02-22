@@ -30,12 +30,13 @@ void EditorScene::Init()
 	playerSpawn->SetRotation(DirectX::XMFLOAT3(commands_json["PLAYER_SPAWN"]["ROTATION"][0], commands_json["PLAYER_SPAWN"]["ROTATION"][1], commands_json["PLAYER_SPAWN"]["ROTATION"][2]));
 
 	if (level_type != LevelType::FE_LEVEL) {
-		//Force-load all zones at all times in editor
+		//Force-load all zones & NPCs at all times in editor
 		allActiveModels.clear();
 		allActiveModelNames.clear();
 		for (int i = 0; i < level_grid->GetAllTiles().size(); i++) {
 			level_grid->GetAllTiles()[i]->LoadTile(LevelOfDetail::HIGH);
 		}
+		level_grid->ForceLoadNPCS();
 	}
 #endif
 }
@@ -386,6 +387,7 @@ bool EditorScene::Update(double dt)
 
 			NPC* new_npc = new NPC();
 			new_npc->SetName(newNpcName);
+			new_npc->SetModelName(level_grid->levelModels.at(selectedNewModelIndex).name);
 			new_npc->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).LOD0));
 			new_npc->Create();
 			new_npc->CreateModel();

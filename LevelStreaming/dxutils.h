@@ -120,11 +120,11 @@ struct LoadedModel
 };
 
 struct BinModel {
-	LevelOfDetail modelLOD;
-	std::string modelName;
-	int pakOffset;
-	int pakLength;
-	int modelPartCount;
+	LevelOfDetail modelLOD = LevelOfDetail::UNLOADED;
+	std::string modelName = "";
+	int pakOffset = -1;
+	int pakLength = -1;
+	int modelPartCount = -1;
 	std::vector<int> vertCount = std::vector<int>();
 };
 

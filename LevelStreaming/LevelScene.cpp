@@ -115,7 +115,6 @@ void LevelScene::Init()
 			GameObjectManager::AddObject(new_npc);
 			level_grid->AddNPC(new_npc);
 		}
-		level_grid->ForceLoadNPCS();
 
 		//Load all trigger placements to the whole grid
 		for (int i = 0; i < commands_json["TRIGGERS"].size(); i++) {

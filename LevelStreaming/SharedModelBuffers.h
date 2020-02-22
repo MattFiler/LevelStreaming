@@ -46,7 +46,7 @@ private:
 	std::vector<SharedModelPart*> allModels = std::vector<SharedModelPart*>();
 	std::vector<SimpleVertex> allVerts = std::vector<SimpleVertex>();
 
-	BinModel modelData;
+	BinModel modelData = BinModel();
 
 	std::string objPath = "";
 	int vertexCount = 0;

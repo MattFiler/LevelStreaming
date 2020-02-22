@@ -226,7 +226,6 @@ std::vector<Trigger*> LevelZoneGrid::GetActiveTriggers(Camera* _player)
 /* For debugging, load all NPCs at their highest LOD */
 void LevelZoneGrid::ForceLoadNPCS()
 {
-	return;
 	bool didLoad = false;
 	for (int i = 0; i < levelNPCs.size(); i++) {
 		for (int x = 0; x < levelModels.size(); x++) {
