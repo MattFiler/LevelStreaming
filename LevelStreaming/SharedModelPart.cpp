@@ -28,11 +28,8 @@ SharedModelPart::SharedModelPart(LoadedModelPart _m)
 	//Setup material
 	loadedMaterial.materialName = modelMetaData.thisMaterial.materialName;
 
-	//Load texture file
-	ID3D11ShaderResourceView* newTex;
-	std::wstring widestr = std::wstring(modelMetaData.thisMaterial.texturePath.begin(), modelMetaData.thisMaterial.texturePath.end());
-	HR(CreateDDSTextureFromFile(dxshared::m_pDevice, widestr.c_str(), nullptr, &newTex));
-	loadedMaterial.materialTexture = newTex;
+	//Load texture file from PAK
+	loadedMaterial.materialTexture = dxutils.LoadTextureFromPAK(modelMetaData.thisMaterial.textureID);
 
 	//Populate colour data
 	loadedMaterial.materialColour.x = modelMetaData.thisMaterial.r;

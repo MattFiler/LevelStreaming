@@ -21,6 +21,7 @@ void LevelScene::Init()
 	commands_json = json::from_bson(contents);
 #endif
 
+	dxshared::currentLevelPath = level_path;
 	if (level_type != LevelType::FE_LEVEL) {
 		//Create the zone grid
 		DirectX::XMFLOAT2 gridBottomLeft = DirectX::XMFLOAT2(commands_json["BOUNDS"]["BOTTOM_LEFT"][0], commands_json["BOUNDS"]["BOTTOM_LEFT"][1]);
@@ -79,6 +80,21 @@ void LevelScene::Init()
 		for (int i = 0; i < allModelPairs.size(); i++) {
 			level_grid->AddLevelModelPair(allModelPairs[i]);
 		}
+
+		//Parse texture metadata, and share to our static pool
+		dxshared::currentTexturePool.clear();
+		std::ifstream fin2(level_path + "LEVEL_TEXTURES.BIN", std::ios::in | std::ios::binary);
+		fin2.read((char*)&file_version, 4);
+		//if (file_version !=)
+		fin2.read((char*)&entry_count, 4);
+		for (int i = 0; i < entry_count; i++) {
+			BinTexture thisTextureData = BinTexture();
+			fin2.read((char*)&thisTextureData.textureID, 4);
+			fin2.read((char*)&thisTextureData.pakOffset, 4);
+			fin2.read((char*)&thisTextureData.pakLength, 4);
+			dxshared::currentTexturePool.push_back(thisTextureData);
+		}
+		fin2.close();
 
 		//Load all NPC placements to the whole grid
 		for (int i = 0; i < commands_json["NPCS"].size(); i++) {

@@ -239,12 +239,34 @@ public:
 		return temp;
 	}
 
+	/* Load a texture from a PAK archive, given an ID */
+	ID3D11ShaderResourceView* LoadTextureFromPAK(int textureID)
+	{
+		//Find our texture in the PAK and return it
+		ID3D11ShaderResourceView* materialTexture = nullptr;
+		for (int i = 0; i < dxshared::currentTexturePool.size(); i++) {
+			if (dxshared::currentTexturePool[i].textureID == textureID) {
+				std::ifstream fin(dxshared::currentLevelPath + "LEVEL_TEXTURES.PAK", std::ios::in | std::ios::binary);
+				fin.seekg(dxshared::currentTexturePool[i].pakOffset);
+				uint8_t* thing;
+				thing = new uint8_t[dxshared::currentTexturePool[i].pakLength];
+				fin.read((char*)&thing[0], dxshared::currentTexturePool[i].pakLength);
+				CreateDDSTextureFromMemory(dxshared::m_pDevice, (const uint8_t *)thing, dxshared::currentTexturePool[i].pakLength, nullptr, &materialTexture);
+				return materialTexture;
+			}
+		}
+		//Couldn't find one - fall back to our default
+		std::string normstr = "DATA/ENV/GLOBAL/plastic_base.dds";
+		std::wstring widestr = std::wstring(normstr.begin(), normstr.end());
+		HR(CreateDDSTextureFromFile(dxshared::m_pDevice, widestr.c_str(), nullptr, &materialTexture));
+		return materialTexture;
+	}
+
 	/* Load a model from a PAK archive, given BIN header info */
-	LoadedModel LoadModelFromPAK(std::string pak_path, BinModel model_data) 
+	LoadedModel LoadModelFromPAK(BinModel model_data) 
 	{
 		//Open PAK and skip to the bit we're interested in
-		std::ifstream fin(pak_path, std::ios::in | std::ios::binary);
-		if (!fin.is_open()) Debug::Log("FUCK");
+		std::ifstream fin(dxshared::currentLevelPath + "LEVEL_MODELS.PAK", std::ios::in | std::ios::binary);
 		fin.seekg(model_data.pakOffset);
 
 		//Load data for each model part

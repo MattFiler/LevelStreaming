@@ -181,14 +181,14 @@ void LevelZoneGrid::TrackLoading()
 		{
 			if (levelNPCs[i]->GetLOD() == LevelOfDetail::UNLOADED) {
 				for (int x = 0; x < levelModels.size(); x++) {
-					if (levelModels[x].modelName == levelNPCs[i]->GetModelName()) {
-						Debug::Log("Loading NPC, with model " + levelModels[x].modelName + ", at LOD " + std::to_string((int)tile->GetLOD()) + ".");
+					if (levelModels[x].name == levelNPCs[i]->GetModelName()) {
+						Debug::Log("Loading NPC, with model " + levelModels[x].name + ", at LOD " + std::to_string((int)tile->GetLOD()) + ".");
 						switch (tile->GetLOD()) {
 							case LevelOfDetail::HIGH:
-								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD1, tile->GetLOD()));
+								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].LOD0));
 								break;
 							case LevelOfDetail::LOW:
-								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD2, tile->GetLOD()));
+								levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].LOD1));
 								break;
 						}
 						levelNPCs[i]->CreateModel();

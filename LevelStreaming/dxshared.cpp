@@ -19,5 +19,9 @@ bool dxshared::pauseNPCs = true;
 bool dxshared::pauseNPCs = false;
 #endif
 
+std::string dxshared::currentLevelPath = "";
+
+std::vector<BinTexture> dxshared::currentTexturePool = std::vector<BinTexture>();
+
 ImGuizmo::OPERATION dxshared::mCurrentGizmoOperation = ImGuizmo::ROTATE;
 ImGuizmo::MODE dxshared::mCurrentGizmoMode = ImGuizmo::WORLD;
