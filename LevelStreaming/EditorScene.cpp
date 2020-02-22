@@ -352,21 +352,21 @@ bool EditorScene::Update(double dt)
 	if (showModelSelector) {
 		ImGui::Begin("Available Models", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 		for (int i = 0; i < level_grid->levelModels.size(); i++) {
-			ImGui::RadioButton((level_grid->levelModels.at(i).modelName).c_str(), &selectedNewModelIndex, i);
+			ImGui::RadioButton((level_grid->levelModels.at(i).name).c_str(), &selectedNewModelIndex, i);
 		}
 		if (ImGui::Button("Add Selected Model")) {
 			Model* new_model = new Model();
-			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1, LevelOfDetail::HIGH));
+			new_model->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).LOD0));
 			new_model->Create();
 			GameObjectManager::AddObject(new_model);
-			allActiveModelNames.push_back(level_grid->levelModels.at(selectedNewModelIndex).modelName);
+			allActiveModelNames.push_back(level_grid->levelModels.at(selectedNewModelIndex).name);
 			allActiveModels.push_back(new_model);
 
 			selectedEditModel = allActiveModels.size() - 1;
 
 			showModelSelector = false;
 			showPopup = true;
-			popupString = "Added new model: " + level_grid->levelModels.at(selectedNewModelIndex).modelName;
+			popupString = "Added new model: " + level_grid->levelModels.at(selectedNewModelIndex).name;
 		}
 		ImGui::End();
 	}
@@ -377,7 +377,7 @@ bool EditorScene::Update(double dt)
 		ImGui::Text("NPC Model");
 		ImGui::Separator();
 		for (int i = 0; i < level_grid->levelModels.size(); i++) {
-			ImGui::RadioButton((level_grid->levelModels.at(i).modelName).c_str(), &selectedNewModelIndex, i);
+			ImGui::RadioButton((level_grid->levelModels.at(i).name).c_str(), &selectedNewModelIndex, i);
 		}
 		ImGui::Separator(); 
 		char npcName[128] = ""; ImGui::Text("NPC Name"); ImGui::SameLine();
@@ -386,7 +386,7 @@ bool EditorScene::Update(double dt)
 
 			NPC* new_npc = new NPC();
 			new_npc->SetName(newNpcName);
-			new_npc->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).modelPath_LOD1, LevelOfDetail::HIGH));
+			new_npc->SetData(level_grid->LoadModelToLevel(level_grid->levelModels.at(selectedNewModelIndex).LOD0));
 			new_npc->Create();
 			new_npc->CreateModel();
 			GameObjectManager::AddObject(new_npc);

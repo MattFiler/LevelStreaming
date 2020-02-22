@@ -21,10 +21,6 @@ void LevelScene::Init()
 	commands_json = json::from_bson(contents);
 #endif
 
-	//Parse models JSON
-	std::fstream mdl_js(level_path + "MODELS_LEVEL.JSON");
-	mdl_js >> models_json;
-
 	if (level_type != LevelType::FE_LEVEL) {
 		//Create the zone grid
 		DirectX::XMFLOAT2 gridBottomLeft = DirectX::XMFLOAT2(commands_json["BOUNDS"]["BOTTOM_LEFT"][0], commands_json["BOUNDS"]["BOTTOM_LEFT"][1]);
@@ -32,13 +28,56 @@ void LevelScene::Init()
 		level_grid = new LevelZoneGrid(gridBottomLeft, gridTopRight, commands_json["SUBDIVISION"]);
 
 		//Load all model metadata
-		for (int i = 0; i < models_json["MODEL_DEFS"].size(); i++)
-		{
-			ModelDef this_model = ModelDef();
-			this_model.modelName = models_json["MODEL_DEFS"][i]["NAME"].get<std::string>();
-			this_model.modelPath_LOD1 = level_path + models_json["MODEL_DEFS"][i]["PATH_LOD1"].get<std::string>();
-			this_model.modelPath_LOD2 = level_path + models_json["MODEL_DEFS"][i]["PATH_LOD2"].get<std::string>();
-			level_grid->AddLevelModel(this_model);
+		std::vector<BinModel> allModelDefs = std::vector<BinModel>();
+		std::ifstream fin(level_path + "LEVEL_MODELS.BIN", std::ios::in | std::ios::binary);
+		int file_version;
+		fin.read((char*)&file_version, 4);
+		//if (file_version !=)
+		int entry_count;
+		fin.read((char*)&entry_count, 4);
+		for (int i = 0; i < entry_count; i++) {
+			BinModel thisModelData = BinModel();
+			thisModelData.modelName = "";
+			INT8 string_len;
+			fin.read((char*)&string_len, 1);
+			for (int x = 0; x < string_len; x++) {
+				char this_char;
+				fin.read((char*)&this_char, 1);
+				thisModelData.modelName += this_char;
+			}
+			INT16 lod;
+			fin.read((char*)&lod, 2);
+			thisModelData.modelLOD = (LevelOfDetail)lod;
+			fin.read((char*)&thisModelData.pakOffset, 4);
+			fin.read((char*)&thisModelData.pakLength, 4);
+			fin.read((char*)&thisModelData.modelPartCount, 4);
+			for (int x = 0; x < thisModelData.modelPartCount; x++) {
+				int this_vert_count;
+				fin.read((char*)&this_vert_count, 4);
+				thisModelData.vertCount.push_back(this_vert_count);
+			}
+			allModelDefs.push_back(thisModelData);
+		}
+		fin.close();
+
+		//Parse model metadata into LOD pairs, and push up to our streaming grid
+		std::vector<BinModelPair> allModelPairs = std::vector<BinModelPair>();
+		for (int i = 0; i < allModelDefs.size(); i++) {
+			for (int x = 0; x < allModelPairs.size(); x++) {
+				if (allModelPairs[x].name == allModelDefs[i].modelName) {
+					if (allModelDefs[i].modelLOD == LevelOfDetail::HIGH) allModelPairs[x].LOD0 = allModelDefs[i];
+					else if (allModelDefs[i].modelLOD == LevelOfDetail::LOW) allModelPairs[x].LOD1 = allModelDefs[i];
+					continue;
+				}
+			}
+			BinModelPair newPair = BinModelPair();
+			newPair.name = allModelDefs[i].modelName;
+			if (allModelDefs[i].modelLOD == LevelOfDetail::HIGH) newPair.LOD0 = allModelDefs[i];
+			else if (allModelDefs[i].modelLOD == LevelOfDetail::LOW) newPair.LOD1 = allModelDefs[i];
+			allModelPairs.push_back(newPair);
+		}
+		for (int i = 0; i < allModelPairs.size(); i++) {
+			level_grid->AddLevelModelPair(allModelPairs[i]);
 		}
 
 		//Load all NPC placements to the whole grid

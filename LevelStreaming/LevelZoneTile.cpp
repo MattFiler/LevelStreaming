@@ -70,16 +70,16 @@ void LevelZoneTile::LoadTileThread(LevelOfDetail _lod)
 	{
 		for (int x = 0; x < mainGrid->levelModels.size(); x++)
 		{
-			if (mainGrid->levelModels[x].modelName == models.at(i).modelName)
+			if (mainGrid->levelModels[x].name == models.at(i).modelName)
 			{
 				Debug::Log("LOAD THREAD: Creating instance of model: " + models.at(i).modelName);
 				Model* new_model = new Model();
 				switch (_lod) {
 				case LevelOfDetail::HIGH:
-					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD1, _lod));
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].LOD0));
 					break;
 				case LevelOfDetail::LOW:
-					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].modelPath_LOD2, _lod));
+					new_model->SetData(mainGrid->LoadModelToLevel(mainGrid->levelModels[x].LOD1));
 					break;
 				}
 				new_model->SetPosition(models.at(i).position);

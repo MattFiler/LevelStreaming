@@ -134,6 +134,19 @@ LevelZoneTileNeighbours LevelZoneGrid::GetTileNeighbours(LevelZoneTile * _t)
 	return neighbours;
 }
 
+/* Get model BIN data given the model name and LOD */
+BinModel LevelZoneGrid::GetModelData(std::string model_name, LevelOfDetail model_lod) 
+{
+	for (int i = 0; i < levelModels.size(); i++) {
+		if (levelModels[i].name == model_name) {
+			if (model_lod == LevelOfDetail::HIGH) return levelModels[i].LOD0;
+			else if (model_lod == LevelOfDetail::LOW) return levelModels[i].LOD1;
+		}
+	}
+	Debug::Log("ERROR! Requested model data for model '" + model_name + "' at LOD " + std::to_string((int)model_lod) + ", but it wasn't found!");
+	return BinModel();
+}
+
 /* Keep track of load states on all tiles (should call on update) */
 void LevelZoneGrid::TrackLoading()
 {
@@ -217,9 +230,9 @@ void LevelZoneGrid::ForceLoadNPCS()
 	bool didLoad = false;
 	for (int i = 0; i < levelNPCs.size(); i++) {
 		for (int x = 0; x < levelModels.size(); x++) {
-			if (levelModels[x].modelName == levelNPCs[i]->GetModelName()) {
-				Debug::Log("Loading NPC, with model " + levelModels[x].modelName);
-				levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].modelPath_LOD1, LevelOfDetail::HIGH));
+			if (levelModels[x].name == levelNPCs[i]->GetModelName()) {
+				Debug::Log("Loading NPC, with model " + levelModels[x].name);
+				levelNPCs[i]->SetData(LoadModelToLevel(levelModels[x].LOD0));
 				levelNPCs[i]->CreateModel();
 				didLoad = true;
 				break;
@@ -233,18 +246,19 @@ void LevelZoneGrid::ForceLoadNPCS()
 }
 
 /* Requested load of model: check our existing loaded data, and if not already loaded, load it */
-SharedModelBuffers * LevelZoneGrid::LoadModelToLevel(std::string model_path, LevelOfDetail lod)
+SharedModelBuffers* LevelZoneGrid::LoadModelToLevel(BinModel model_data)
 {
 	//Return an already loaded model buffer, if it exists
 	for (int i = 0; i < loadedModels.size(); i++) {
-		if (loadedModels[i]->GetFilePath() == model_path) {
+		if (loadedModels[i]->GetModelData().modelName == model_data.modelName &&
+			loadedModels[i]->GetModelData().modelLOD == model_data.modelLOD) {
 			Debug::Log("Pulling model from pool.");
 			return loadedModels[i];
 		}
 	}
 
 	//Model isn't already loaded - load it
-	SharedModelBuffers* newLoadedModel = new SharedModelBuffers(model_path, lod);
+	SharedModelBuffers* newLoadedModel = new SharedModelBuffers(model_data);
 	loadedModels.push_back(newLoadedModel);
 	return newLoadedModel;
 }

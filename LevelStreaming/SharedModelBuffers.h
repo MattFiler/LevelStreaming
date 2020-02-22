@@ -6,14 +6,14 @@
 
 class SharedModelBuffers {
 public:
-	SharedModelBuffers(std::string path_to_obj, LevelOfDetail lod);
+	SharedModelBuffers(BinModel model_data);
 	~SharedModelBuffers();
 
-	void Render(XMMATRIX mWorld);
-
-	std::string GetFilePath() {
-		return objPath;
+	BinModel GetModelData() {
+		return modelData;
 	}
+
+	void Render(XMMATRIX mWorld);
 
 	int GetVertCount() {
 		return vertexCount;
@@ -30,7 +30,7 @@ public:
 	}
 
 	LevelOfDetail GetLOD() {
-		return thisLOD;
+		return modelData.modelLOD;
 	}
 
 private:
@@ -46,7 +46,7 @@ private:
 	std::vector<SharedModelPart*> allModels = std::vector<SharedModelPart*>();
 	std::vector<SimpleVertex> allVerts = std::vector<SimpleVertex>();
 
-	LevelOfDetail thisLOD = LevelOfDetail::HIGH;
+	BinModel modelData;
 
 	std::string objPath = "";
 	int vertexCount = 0;

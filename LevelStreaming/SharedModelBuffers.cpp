@@ -1,13 +1,12 @@
 #include "SharedModelBuffers.h"
 
 /* Load a model and create the buffers */
-SharedModelBuffers::SharedModelBuffers(std::string path_to_obj, LevelOfDetail lod)
+SharedModelBuffers::SharedModelBuffers(BinModel model_data)
 {
 	//Push data for our vertex buffer, and create children index buffers
 	Debug::Log("Loading model from disk.");
-	objPath = path_to_obj;
-	thisLOD = lod;
-	LoadedModel _m = dxutils.LoadModel(path_to_obj);
+	modelData = model_data;
+	LoadedModel _m = dxutils.LoadModelFromPAK("DATA/ENV/PRODUCTION/TEST_LEVEL/LEVEL_MODELS.PAK", model_data); //TODO: pass level path here
 	for (int i = 0; i < _m.modelParts.size(); i++) {
 		for (int x = 0; x < _m.modelParts[i].compVertices.size(); x++) {
 			allVerts.push_back(_m.modelParts[i].compVertices[x]);

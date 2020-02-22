@@ -97,6 +97,7 @@ struct Material
 
 	float r, g, b, a = 1.0f;
 	std::string texturePath = "DATA/ENV/GLOBAL/plastic_base.dds"; //placeholder blank texture
+	int textureID = -1; //Used by the new BIN/PAK loading
 };
 
 struct LoadedMaterial
@@ -125,6 +126,12 @@ struct BinModel {
 	int pakLength;
 	int modelPartCount;
 	std::vector<int> vertCount = std::vector<int>();
+};
+
+struct BinModelPair {
+	std::string name = "";
+	BinModel LOD0 = BinModel();
+	BinModel LOD1 = BinModel();
 };
 
 struct Face
@@ -232,8 +239,50 @@ public:
 		return temp;
 	}
 
-	/* Load a model and return its indices and vertexes (todo: make it condense the vertex array) */
-	LoadedModel LoadModel(std::string path)
+	/* Load a model from a PAK archive, given BIN header info */
+	LoadedModel LoadModelFromPAK(std::string pak_path, BinModel model_data) 
+	{
+		//Open PAK and skip to the bit we're interested in
+		std::ifstream fin(pak_path, std::ios::in | std::ios::binary);
+		if (!fin.is_open()) Debug::Log("FUCK");
+		fin.seekg(model_data.pakOffset);
+
+		//Load data for each model part
+		LoadedModel thisModel = LoadedModel();
+		LoadedModelPart modelPart = LoadedModelPart();
+		for (int i = 0; i < model_data.modelPartCount; i++) {
+			fin.read((char*)&modelPart.thisMaterial.r, 4);
+			fin.read((char*)&modelPart.thisMaterial.g, 4);
+			fin.read((char*)&modelPart.thisMaterial.b, 4);
+			fin.read((char*)&modelPart.thisMaterial.a, 4);
+			fin.read((char*)&modelPart.thisMaterial.textureID, 4);
+
+			for (int x = 0; x < model_data.vertCount[i]; x++) {
+				int index_number;
+				fin.read((char*)&index_number, 4);
+				modelPart.compIndices.push_back((WORD)index_number);
+
+				SimpleVertex thisVert = SimpleVertex();
+				fin.read((char*)&thisVert.Pos.x, 4);
+				fin.read((char*)&thisVert.Pos.y, 4);
+				fin.read((char*)&thisVert.Pos.z, 4);
+				fin.read((char*)&thisVert.Tex.x, 4);
+				fin.read((char*)&thisVert.Tex.y, 4);
+				fin.read((char*)&thisVert.Normal.x, 4);
+				fin.read((char*)&thisVert.Normal.y, 4);
+				fin.read((char*)&thisVert.Normal.z, 4);
+				modelPart.compVertices.push_back(thisVert);
+			}
+
+			thisModel.modelParts.push_back(modelPart);
+			modelPart = LoadedModelPart();
+		}
+		fin.close();
+		return thisModel;
+	}
+
+	/* Load a model from an OBJ file and return its indices and vertexes (todo: make it condense the vertex array) */
+	LoadedModel LoadModelFromOBJ(std::string path)
 	{
 		//Open OBJ
 		std::ifstream in(path.c_str());

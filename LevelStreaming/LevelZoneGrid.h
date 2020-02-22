@@ -34,7 +34,7 @@ public:
 
 	void Resize(DirectX::XMFLOAT2 _bl, DirectX::XMFLOAT2 _tr, int _sd);
 
-	void AddLevelModel(ModelDef _m) {
+	void AddLevelModelPair(BinModelPair _m) {
 		levelModels.push_back(_m);
 	}
 	void AddNPC(NPC* _npc) {
@@ -51,13 +51,15 @@ public:
 		return levelTiles;
 	}
 
+	BinModel GetModelData(std::string model_name, LevelOfDetail model_lod);
+
 	void TrackLoading();
 	std::vector<Trigger*> GetActiveTriggers(Camera* _player);
 
 	void ForceLoadNPCS();
 
 private:
-	SharedModelBuffers* LoadModelToLevel(std::string model_path, LevelOfDetail lod);
+	SharedModelBuffers* LoadModelToLevel(BinModel model_data);
 
 	DirectX::XMFLOAT2 bottomLeft;
 	DirectX::XMFLOAT2 topRight;
@@ -67,7 +69,7 @@ private:
 	int subdivisionCount;
 
 	std::vector<LevelZoneTile*> levelTiles = std::vector<LevelZoneTile*>();             //All tiles in the level
-	std::vector<ModelDef> levelModels = std::vector<ModelDef>();                        //Definitions of paths to model LODs
+	std::vector<BinModelPair> levelModels = std::vector<BinModelPair>();                //Definitions of model data (to be pulled from our PAK)
 	std::vector<SharedModelBuffers*> loadedModels = std::vector<SharedModelBuffers*>(); //Loaded model buffers
 	std::vector<NPC*> levelNPCs = std::vector<NPC*>();                                  //All NPCs in the level
 	std::vector<Trigger*> levelTriggers = std::vector<Trigger*>();                      //All triggers in the level

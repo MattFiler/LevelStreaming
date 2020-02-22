@@ -30,7 +30,6 @@ protected:
 	LevelType level_type;
 
 	json commands_json;
-	json models_json;
 
 	Camera main_cam;
 	Light light_source;
