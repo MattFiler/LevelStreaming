@@ -64,13 +64,16 @@ void LevelScene::Init()
 		//Parse model metadata into LOD pairs, and push up to our streaming grid
 		std::vector<BinModelPair> allModelPairs = std::vector<BinModelPair>();
 		for (int i = 0; i < allModelDefs.size(); i++) {
+			bool didAdd = false;
 			for (int x = 0; x < allModelPairs.size(); x++) {
 				if (allModelPairs[x].name == allModelDefs[i].modelName) {
 					if (allModelDefs[i].modelLOD == LevelOfDetail::HIGH) allModelPairs[x].LOD0 = allModelDefs[i];
 					else if (allModelDefs[i].modelLOD == LevelOfDetail::LOW) allModelPairs[x].LOD1 = allModelDefs[i];
-					continue;
+					didAdd = true;
+					break;
 				}
 			}
+			if (didAdd) continue;
 			BinModelPair newPair = BinModelPair();
 			newPair.name = allModelDefs[i].modelName;
 			if (allModelDefs[i].modelLOD == LevelOfDetail::HIGH) newPair.LOD0 = allModelDefs[i];
