@@ -1,5 +1,0 @@
--Load NPCs to level, render them given the tile they're in, always update them
-	-Maybe lower the update tick or complexity when non rendered (AI LODDING)
--Ability to add player spawn location in editor
--Ability to add bounding boxes in editor
--Some form of scripting to link bounding boxes to triggers, etc
